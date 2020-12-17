@@ -1,30 +1,42 @@
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
 const path = require('path');
 const crs = require('crypto-random-string');
+const sharp = require('sharp');
 
 // Import util funs
-const { uploadImg, sendConvertedImg, deleteOldFiles } = require('../util/filehandler');
+const { uploadImg, deleteOldFiles } = require('../util/filehandler');
 
 // Create the path which will be used
 const baseTempPath = path.join(__dirname, '../store/tmp/');
 
 const convertPdfService = async (req, res) => {
-	const { convertFrom, convertTo } = req.query;
+	const { convertFrom } = req.query;
 	const id = crs({ length: 10 });
-	const doc = new PDFDocument({size: [500, 500],});
 	let pathFrom = `${baseTempPath}${id}.${convertFrom}`;
-	let pathTo = `${baseTempPath}${id}.${convertTo}`;
 
-	pathFrom = await uploadImg(req, `${pathFrom}.${convertFrom}`);
+	try {
+		// Upload the img
+		pathFrom = await uploadImg(req, `${pathFrom}.${convertFrom}`);
 
-	doc.image(pathFrom, 0, 0, {
-		fit: [500, 500],
-	});
+		// Start img processing, load relevant metadata and img itself
+		const { width, height } = await sharp(pathFrom).metadata();
 
-	doc.end();
+		// As soon as data are loaded, create the pdf
+		let doc = new PDFDocument({ size: [width, height] });
+		doc.image(pathFrom, 0, 0, {
+			fit: [width, height],
+		});
 
-	doc.pipe(res);
+		// Round up the document, pipe doc to client and clean up
+		// Then pipe the response to the client
+		doc.end();
+		doc.pipe(res);
+	} catch (e) {
+		log.push(e.message);
+		res.status(500).send({ msg: 'Something went wrong', error: e.message });
+	} finally {
+		deleteOldFiles(pathFrom);
+	}
 };
 
 module.exports = { convertPdfService };
