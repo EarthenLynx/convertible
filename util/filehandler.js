@@ -1,3 +1,4 @@
+const { log } = require('console');
 const fs = require('fs');
 
 // Create a writestream and temporarily save the img
@@ -7,7 +8,7 @@ const uploadImg = (req, path) => {
 		req.pipe(stream);
 
 		stream.on('open', () => console.log('Started upload ...'));
-    stream.on('finish', () => resolve(path));
+		stream.on('close', () => resolve(path));
 		stream.on('error', err => reject(err));
 	});
 };
@@ -18,7 +19,7 @@ const sendConvertedImg = (res, path) => {
 		const stream = fs.createReadStream(path);
 
 		stream.on('open', () => stream.pipe(res));
-		stream.on('finish', () => resolve(path));
+		stream.on('close', () => resolve(path));
 		stream.on('error', err => reject(err));
 	});
 };
@@ -26,7 +27,7 @@ const sendConvertedImg = (res, path) => {
 // Delete a given set of old files
 const deleteOldFiles = (...args) => {
 	return new Promise((resolve, reject) => {
-    console.log('deleting old files now');
+		console.log('deleting old files now');
 		try {
 			args.forEach(arg => fs.unlinkSync(arg));
 			resolve([...args]);
@@ -36,4 +37,12 @@ const deleteOldFiles = (...args) => {
 	});
 };
 
-module.exports = { uploadImg, sendConvertedImg, deleteOldFiles };
+const cleanTempDir = async dirname => {
+	const dir = await fs.promises.opendir(dirname);
+
+	for await (const dirent of dir) {
+		fs.unlinkSync(dirname + dirent.name);
+	}
+};
+
+module.exports = { uploadImg, sendConvertedImg, deleteOldFiles, cleanTempDir };
