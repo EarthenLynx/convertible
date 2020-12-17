@@ -15,6 +15,7 @@
     "express-handlebars": "^4.0.3",
     "formidable": "^1.2.2",
     "pdfkit": "^0.11.0",
+    "pm2": "^4.5.1",
     "sharp": "^0.26.3",
     "webp-converter": "^2.3.1"
   },
