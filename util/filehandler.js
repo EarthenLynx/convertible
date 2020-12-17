@@ -4,9 +4,8 @@ const fs = require('fs');
 const uploadImg = (req, path) => {
 	return new Promise((resolve, reject) => {
 		const stream = fs.createWriteStream(path);
-		req.pipe(stream);
 
-		stream.on('open', () => console.log('Started upload ...'));
+		stream.on('open', () => req.pipe(stream));
 		stream.on('close', () => resolve(path));
 		stream.on('error', err => reject(err));
 	});
@@ -26,7 +25,6 @@ const sendConvertedImg = (res, path) => {
 // Delete a given set of old files
 const deleteOldFiles = (...args) => {
 	return new Promise((resolve, reject) => {
-		console.log('deleting old files now');
 		try {
 			args.forEach(arg => fs.unlinkSync(arg));
 			resolve([...args]);
