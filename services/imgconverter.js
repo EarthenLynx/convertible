@@ -9,10 +9,9 @@ const { uploadImg, sendConvertedImg, deleteOldFiles } = require('../util/filehan
 const baseTempPath = path.join(__dirname, '../store/tmp/');
 
 // Create the modular functions used in the service
-const resizeImg = (img, widthFrom, widthTo, heightFrom, heightTo, keepAspectRatio) => {
+const resizeImg = (img, widthFrom, widthTo, heightFrom, heightTo, keepAspectRatio, imgFit) => {
 	// Calculate img aspect ratio
 	const ratioFrom = (parseInt(widthFrom) / parseInt(heightFrom)).toFixed(2);
-	const ratioTo = (parseInt(widthTo) / parseInt(heightTo)).toFixed(2);
 
 	// Define the options for the resizing
 	let resizeOptions = {
@@ -26,8 +25,8 @@ const resizeImg = (img, widthFrom, widthTo, heightFrom, heightTo, keepAspectRati
 		heightTo = widthTo / ratioFrom;
 	}
 
-	// If the old and new ratio differ, redo the fit property
-	if (ratioFrom !== ratioTo) {
+	// If user wants to fit the img, set property accordingly
+	if (imgFit) {
 		resizeOptions.fit = 'contain';
 	}
 
@@ -77,11 +76,28 @@ const setFixedAspectRatio = (img, widthFrom, heightFrom, fixedAspectRatio) => {
 	return img.resize(parseInt(widthTo), parseInt(heightTo));
 };
 
+const convertImg = (img, convertTo, qualityTo) => {
+	const formatOptions = { quality: parseInt(qualityTo) };
+	switch (convertTo) {
+		case 'webp':
+			return img.webp(formatOptions);
+
+		case 'png':
+			return img.png(formatOptions);
+
+		case 'jpg':
+			return img.jpeg(formatOptions);
+
+		default:
+			break;
+	}
+};
+
 // Create the image service
 const convertImgService = async (req, res) => {
 	const id = crs({ length: 24 });
 	let log = [];
-	let { convertFrom, convertTo, heightTo, widthTo, qualityTo, fixedAspectRatio, keepAspectRatio } = req.query;
+	let { convertFrom, convertTo, heightTo, widthTo, qualityTo, fixedAspectRatio, keepAspectRatio, imgFit } = req.query;
 
 	// Define the paths. Their endings determine the conversion format
 	let pathFrom = `${baseTempPath}${id}_in.${convertFrom}`;
@@ -96,12 +112,13 @@ const convertImgService = async (req, res) => {
 		const { width: widthFrom, height: heightFrom } = await sharp(pathFrom).metadata();
 		let img = sharp(pathFrom);
 
+		// If img is to be resized, do the necessary operation
 		if ((heightTo || widthTo) && (widthFrom != widthTo || heightTo != heightFrom)) {
 			log.push(`> FileID ${id}: Image source and target size differ, resizing ...`);
-			img = resizeImg(img, widthFrom, widthTo, heightFrom, heightTo, keepAspectRatio);
+			img = resizeImg(img, widthFrom, widthTo, heightFrom, heightTo, keepAspectRatio, imgFit);
 		}
 
-		// If user inputs fixed aspect ratio,
+		// If user inputs fixed aspect ratio, consider it here.
 		if (fixedAspectRatio) {
 			log.push(`> FileID ${id}: Fixed aspect ratio requested, resizing ...`);
 			// If img has been resized before, use that height and width for this function
@@ -111,30 +128,12 @@ const convertImgService = async (req, res) => {
 			} else {
 				img = setFixedAspectRatio(img, widthFrom, heightFrom, fixedAspectRatio);
 			}
-			// If user inputs either desired height or width,
 		}
 
-		// Handle explicit file conversion
-		const formatOptions = { quality: parseInt(qualityTo) };
-		log.push(`> FileID ${id}: Attempting to convert from ${convertFrom} to ${convertTo}`);
-		switch (convertTo) {
-			case 'webp':
-				log.push(`> FileID ${id}: Converting to webp with quality ${formatOptions.quality}`);
-				img = img.webp(formatOptions);
-				break;
-
-			case 'png':
-				log.push(`> FileID ${id}: Converting to png with quality ${formatOptions.quality}`);
-				img = img.png(formatOptions);
-				break;
-
-			case 'jpg':
-				log.push(`> FileID ${id}: Converting to jpg with quality ${formatOptions.quality}`);
-				img = img.jpeg(formatOptions);
-				break;
-
-			default:
-				break;
+		// Handle explicit file conversion and adjust quality
+		if (convertFrom && convertTo && convertFrom !== convertTo) {
+			log.push(`> FileID ${id}: Attempting to convert from ${convertFrom} to ${convertTo}`);
+			img = convertImg(img, convertTo, qualityTo);
 		}
 
 		// After operations are done, save to file
@@ -145,7 +144,7 @@ const convertImgService = async (req, res) => {
 		log.push(`> FileID ${id}: Now sending file back to client ...`);
 
 		img.end();
-		await sendConvertedImg(res, pathTo);
+		return await sendConvertedImg(res, pathTo);
 	} catch (e) {
 		log.push(`> Something went wrong: ${e.message}`);
 		res.status(500).send({ msg: 'Something went wrong', error: e.message });
