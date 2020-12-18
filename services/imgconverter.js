@@ -12,7 +12,7 @@ const baseTempPath = path.join(__dirname, '../store/tmp/');
 const convertImgService = async (req, res) => {
 	const id = crs({ length: 24 });
 	let log = [];
-	let { convertFrom, convertTo, heightTo, widthTo, qualityTo, keepAspectRatio } = req.query;
+	let { convertFrom, convertTo, heightTo, widthTo, qualityTo, fixedAspectRatio, keepAspectRatio } = req.query;
 
 	// Define the paths. Their endings determine the conversion format
 	let pathFrom = `${baseTempPath}${id}_in.${convertFrom}`;
@@ -27,8 +27,58 @@ const convertImgService = async (req, res) => {
 		const { width: widthFrom, height: heightFrom } = await sharp(pathFrom).metadata();
 		let img = sharp(pathFrom);
 
-		// Do img resize operations if values are provided and source and target values differ
-		if ((heightTo || widthTo) && (widthFrom != widthTo || heightTo != heightFrom)) {
+		// Now handle the user preferences
+		// 1. Check if a fixed aspect ratio is given
+		// 2. Else, check if user wants to keep aspect ratio
+		// 3. Finally, process the img
+
+		// If user inputs fixed aspect ratio, height and weight are unnecessary
+		if (fixedAspectRatio && !heightTo && !widthTo) {
+			let heightTo = 0;
+			let widthTo = 0;
+
+			log.push(`> FileID ${id}: Fixed aspect ratio given by user, resizing ...`);
+
+			switch (fixedAspectRatio) {
+				// If user chooses hd, transform img into 16:9 format
+				case 'hd':
+					if ((widthFrom * 9) / 16 < heightFrom) {
+						widthTo = widthFrom;
+						heightTo = ((widthFrom * 9) / 16).toFixed(0);
+					} else {
+						heightTo = heightFrom;
+						widthTo = ((heightFrom * 9) / 16).toFixed(0);
+					}
+					break;
+
+				case 'classic':
+					if ((widthFrom * 3) / 4 < heightFrom) {
+						widthTo = widthFrom;
+						heightTo = ((widthFrom * 3) / 4).toFixed(0);
+					} else {
+						heightTo = heightFrom;
+						widthTo = ((heightFrom * 3) / 4).toFixed(0);
+					}
+					break;
+				case 'square':
+					if (widthFrom < heightFrom) {
+						widthTo = widthFrom;
+						heightTo = widthFrom;
+					} else {
+						heightTo = heightFrom;
+						widthTo = heightFrom;
+					}
+					break;
+				default:
+					throw new Error(
+						'This aspect ratio is not supported. Supported formats are "hd" (16:9), "classic" (4:3) or "square" (1:1) '
+					);
+			}
+
+			img = img.resize(parseInt(widthTo), parseInt(heightTo));
+
+			// If user inputs either desired height or width,
+		} else if ((heightTo || widthTo) && (widthFrom != widthTo || heightTo != heightFrom)) {
 			log.push(`> FileID ${id}: Image source and target size differ, resizing ...`);
 
 			// Calculate img aspect ratio
@@ -88,11 +138,11 @@ const convertImgService = async (req, res) => {
 		img.end();
 		await sendConvertedImg(res, pathTo);
 	} catch (e) {
-		log.push(e.message);
+		log.push(`> Something went wrong: ${e.message}`);
 		res.status(500).send({ msg: 'Something went wrong', error: e.message });
 	} finally {
 		log.forEach(el => console.log(el));
-		await deleteOldFiles(pathFrom, pathTo);
+		await deleteOldFiles(pathFrom, pathTo).catch(err => console.log(err));
 	}
 };
 
