@@ -11,6 +11,10 @@
 
 .dropActive {
 	background-color: #ababab;
-  transition: 0.25s;
-  color: #fff;
+	transition: 0.25s;
+	color: #fff;
+}
+
+button {
+	width: 100%;
 }

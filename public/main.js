@@ -1,7 +1,8 @@
 // Main events for drag and drop
 const dropHandler = event => {
 	const dropzone = document.querySelector('#dropzone');
-	const footer = document.querySelector('#card-footer');
+	const fileDesc = document.querySelector('#file-name');
+	const uploadButtonWrap = document.querySelector('#upload-button-wrapper');
 	const fileCount = event.dataTransfer.items.length;
 	const fileItem = event.dataTransfer.items[0].getAsFile();
 	const fileReader = new FileReader();
@@ -22,16 +23,29 @@ const dropHandler = event => {
 	}
 
 	// If the file passes the checks, process it
-	fileReader.readAsDataURL(fileItem);
+	fileReader.readAsArrayBuffer(fileItem);
 
-	fileReader.onload = async event => {
-		console.log(event.target.result);
-		const response = await uploadImage(event.target.result);
+	fileReader.onloadend = async event => {
+		const data = event.target.result;
+
+		// Construct a button and append it to the card footer if it doesn't exist yet
+		let uploadButton = document.querySelector('#upload-button');
+		if (!uploadButton) {
+			uploadButton = document.createElement('button');
+			uploadButton.id = 'upload-button';
+			uploadButton.classList.add('btn', 'btn-primary', 'float-end');
+			uploadButton.innerHTML = 'Send <i class="far fa-paper-plane"></i>';
+			uploadButton.addEventListener('click', () => {
+				const config = getConfig(fileItem.type);
+				uploadImage(data, config);
+			});
+		}
+
+		// Do the styling and provide basic user feedback, given everything went well
+		fileDesc.innerHTML = `<i class="fas fa-photo-video"></i> ${fileItem.name}`;
+		uploadButtonWrap.appendChild(uploadButton);
+		dropzone.classList.remove('dropActive');
 	};
-
-	// Do the styling and provide basic user feedback, given everything went well
-	footer.innerHTML = `<i class="fas fa-photo-video"></i> ${fileItem.name}`;
-	dropzone.classList.remove('dropActive');
 };
 
 //
@@ -46,15 +60,19 @@ const dragLeaveHandler = event => {
 };
 
 // Events to deal with the file itself
-const uploadImage = async img => {
+const uploadImage = async (img, config) => {
+	const rootUrl = 'http://localhost:3000/convert/img?';
 	const url =
 		'http://localhost:3000/convert/img?convertFrom=jpg&convertTo=webp&qualityTo=100&heightTo=60&widthTo=2400&keepAspectRatio=true';
+
 	const options = {
 		method: 'post',
-		data: img,
+		body: img,
 	};
 	const response = await fetch(url, options);
-	console.log(response);
+	const adjustedImg = await response.blob();
+
+	console.log(adjustedImg);
 };
 
 // Helper functions
@@ -81,4 +99,26 @@ const b5Alert = (msg, alertClass) => {
 
 	// Append alert to document
 	document.body.appendChild(alert);
+};
+
+const getConfig = from => {
+	const convertFrom = from;
+	const convertTo = 'webp';
+	const fixedAspectRatio = 'hd';
+	const qualityTo = 100;
+	const heightTo = 60;
+	const widthTo = 2400;
+	const keepAspectRatio = true;
+	const imgFit = true;
+
+	return {
+		convertFrom,
+		convertTo,
+		fixedAspectRatio,
+		qualityTo,
+		heightTo,
+		widthTo,
+		keepAspectRatio,
+		imgFit,
+	};
 };
