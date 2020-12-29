@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set a static folder
-app.use(express.static("public"));
+app.use(express.static("publicbu"));
 
 // Configure the view routes
 app.get("/", (req, res) => res.render("upload"))
