@@ -36,7 +36,7 @@ const dropHandler = event => {
 			uploadButton.classList.add('btn', 'btn-primary', 'float-end');
 			uploadButton.innerHTML = 'Send <i class="far fa-paper-plane"></i>';
 			uploadButton.addEventListener('click', () => {
-				const config = getConfig(fileItem.type);
+				const config = getImageConfig(fileItem.type.split('/')[1]);
 				uploadImage(data, config);
 			});
 		}
@@ -61,18 +61,34 @@ const dragLeaveHandler = event => {
 
 // Events to deal with the file itself
 const uploadImage = async (img, config) => {
-	const rootUrl = 'http://localhost:3000/convert/img?';
-	const url =
-		'http://localhost:3000/convert/img?convertFrom=jpg&convertTo=webp&qualityTo=100&heightTo=60&widthTo=2400&keepAspectRatio=true';
+	const { convertFrom, convertTo, fixedAspectRatio, qualityTo, heightTo, widthTo, keepAspectRatio, imgFit } = config;
+
+	console.log(config);
+
+	let url = 'http://localhost:3000/convert/img?';
+	if (convertFrom && convertFrom !== 'undefined') url += `convertFrom=${convertFrom}&`;
+	if (convertTo && convertTo !== 'undefined') url += `convertTo=${convertTo}&`;
+	if (fixedAspectRatio && fixedAspectRatio !== 'undefined') url += `fixedAspectRatio=${fixedAspectRatio}&`;
+	if (qualityTo && qualityTo !== 'undefined') url += `qualityTo=${qualityTo}&`;
+	if (heightTo && heightTo !== 'undefined') url += `heightTo=${heightTo}&`;
+	if (widthTo && widthTo !== 'undefined') url += `widthTo=${widthTo}&`;
+	if (keepAspectRatio && keepAspectRatio !== 'undefined') url += `keepAspectRatio=${keepAspectRatio}&`;
+	if (imgFit && imgFit !== 'undefined') url += `imgFit=${imgFit}&`;
 
 	const options = {
 		method: 'post',
 		body: img,
 	};
 	const response = await fetch(url, options);
-	const adjustedImg = await response.blob();
-
-	console.log(adjustedImg);
+	if (response.status !== 200) {
+		const data = await response.json();
+		b5Alert(`${data.msg} -> ${data.error}`, 'alert-warning');
+	} else {
+		const adjustedImg = await response.blob();
+		const imgUrl = URL.createObjectURL(adjustedImg);
+		window.location = imgUrl;
+		b5Alert(`Image processing successful`, 'alert-success');
+	}
 };
 
 // Helper functions
@@ -85,6 +101,8 @@ const b5Alert = (msg, alertClass) => {
 	// Add styling and message
 	alert.id = 'alert';
 	alert.classList.add('alert', 'fixed-bottom', alertClass);
+	alert.style.width = '300px';
+	alert.style.margin = 'auto';
 	button.classList.add('btn-close', 'float-end');
 	message.innerHTML = msg;
 
@@ -101,17 +119,17 @@ const b5Alert = (msg, alertClass) => {
 	document.body.appendChild(alert);
 };
 
-const getConfig = from => {
+const getImageConfig = from => {
 	const convertFrom = from;
-	const convertTo = 'webp';
-	const fixedAspectRatio = 'hd';
-	const qualityTo = 100;
-	const heightTo = 60;
-	const widthTo = 2400;
-	const keepAspectRatio = true;
-	const imgFit = true;
+	const convertTo = document.querySelector('#input-convert-to').value;
+	const qualityTo = document.querySelector('#input-quality-to').value;
+	const heightTo = document.querySelector('#input-height-to').value;
+	const widthTo = document.querySelector('#input-width-to').value;
+	const fixedAspectRatio = document.querySelector('#input-fixed-aspect').value;
+	const keepAspectRatio = document.querySelector('#input-keep-aspect').checked;
+	const imgFit = document.querySelector('#input-image-fit').checked;
 
-	return {
+	const config = {
 		convertFrom,
 		convertTo,
 		fixedAspectRatio,
@@ -121,4 +139,6 @@ const getConfig = from => {
 		keepAspectRatio,
 		imgFit,
 	};
+
+	return config;
 };
