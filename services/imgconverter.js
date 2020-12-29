@@ -109,6 +109,7 @@ const convertImgService = async (req, res) => {
 		pathFrom = await uploadImg(req, `${pathFrom}.${convertFrom}`);
 
 		// Start img processing, load relevant metadata and img itself
+		console.log(await sharp(pathFrom).metadata());
 		const { width: widthFrom, height: heightFrom } = await sharp(pathFrom).metadata();
 		let img = sharp(pathFrom);
 
@@ -144,6 +145,7 @@ const convertImgService = async (req, res) => {
 		log.push(`> FileID ${id}: Now sending file back to client ...`);
 
 		img.end();
+		res.set('Content-Type', `image/${convertTo || convertFrom}`);
 		return await sendConvertedImg(res, pathTo);
 	} catch (e) {
 		log.push(`> Something went wrong: ${e.message}`);

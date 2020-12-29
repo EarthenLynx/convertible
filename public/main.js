@@ -63,8 +63,6 @@ const dragLeaveHandler = event => {
 const uploadImage = async (img, config) => {
 	const { convertFrom, convertTo, fixedAspectRatio, qualityTo, heightTo, widthTo, keepAspectRatio, imgFit } = config;
 
-	console.log(config);
-
 	let url = 'http://localhost:3000/convert/img?';
 	if (convertFrom && convertFrom !== 'undefined') url += `convertFrom=${convertFrom}&`;
 	if (convertTo && convertTo !== 'undefined') url += `convertTo=${convertTo}&`;
@@ -84,11 +82,42 @@ const uploadImage = async (img, config) => {
 		const data = await response.json();
 		b5Alert(`${data.msg} -> ${data.error}`, 'alert-warning');
 	} else {
+		console.log(await response.headers);
 		const adjustedImg = await response.blob();
+		console.log(adjustedImg);
 		const imgUrl = URL.createObjectURL(adjustedImg);
-		window.location = imgUrl;
+		appendImage(imgUrl);
 		b5Alert(`Image processing successful`, 'alert-success');
 	}
+};
+
+const appendImage = imgUrl => {
+	// Select and create elements
+	const gallery = document.querySelector('#gallery');
+	const cardWrapper = document.createElement('div');
+	const cardElement = document.createElement('div');
+	const cardBody = document.createElement('div');
+	const cardFooter = document.createElement('div');
+	const imageWrapper = document.createElement('a');
+	const image = document.createElement('img');
+
+	// Add styling
+	cardWrapper.classList.add('col-lg-3', 'col-md-4', 'col-sm-12');
+	cardElement.classList.add('card');
+	cardBody.classList.add('card-body');
+	cardFooter.classList.add('card-footer');
+	cardFooter.innerHTML = 'Click to download';
+	imageWrapper.href = imgUrl;
+	imageWrapper.download = 'AdjustedImg';
+	image.classList.add('img-fluid');
+	image.src = imgUrl;
+
+	// Put the elements together
+	imageWrapper.append(image);
+	cardBody.append(imageWrapper);
+	cardElement.append(cardBody, cardFooter);
+	cardWrapper.append(cardElement);
+	gallery.append(cardWrapper);
 };
 
 // Helper functions
@@ -117,6 +146,9 @@ const b5Alert = (msg, alertClass) => {
 
 	// Append alert to document
 	document.body.appendChild(alert);
+
+	// Make sure the alert gets removed after 5 seconds
+	setTimeout(() => document.querySelector('#alert').remove(), 5000);
 };
 
 const getImageConfig = from => {
