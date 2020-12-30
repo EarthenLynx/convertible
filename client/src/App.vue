@@ -27,14 +27,34 @@
 				</li>
 			</ul>
 		</app-card>
-		<Upload
-			:heading="uploadHeading"
-			:subheading="uploadSubheading"
+
+		<!-- Sidebar and button to open it -->
+		<app-sidebar
+			v-if="showSidebar"
+			heading="Image gallery"
+			subheading="You can choose from your processed images here"
+			:images="filesReceived"
+			@close="showSidebar = false"
+		></app-sidebar>
+		<button
+			v-else
+			class="absolute border-r border-t border-b border-primary top-6 left-0 rounded-r py-4 px-6 text-xl text-primary hover:bg-primary hover:text-white"
+			@click="showSidebar = true"
+		>
+			<i class="fas fa-bars"></i>
+		</button>
+
+		<!-- Upload section -->
+		<app-upload
+			heading="Upload a file"
+			subheading="You can drop your file right in this section"
 			:uploadUrl="uploadUrl"
 			:uploadQuery="uploadQuery"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
 			@imageReceived="filesReceived.push($event)"
 		/>
+
+		<!-- Form Section -->
 		<section class="grid md:grid-cols-1 xl:grid-cols-2 gap-4 pt-4">
 			<app-select name="Format" label="Format" @change="fileOptions.convertTo = $event" :options="convertOptions" />
 			<app-select
@@ -55,7 +75,8 @@
 </template>
 
 <script>
-import Upload from '@/components/Upload';
+import AppSidebar from '@/components/AppSidebar';
+import AppUpload from '@/components/AppUpload';
 import AppSelect from '@/components/AppSelect';
 import AppNumber from '@/components/AppNumberInput';
 import AppSwitch from '@/components/AppSwitch';
@@ -65,7 +86,8 @@ import { convertOptions, fixedRatioOptions } from '@/config/options';
 export default {
 	name: 'App',
 	components: {
-		Upload,
+		AppSidebar,
+		AppUpload,
 		AppSelect,
 		AppNumber,
 		AppSwitch,
@@ -74,10 +96,8 @@ export default {
 
 	data() {
 		return {
-			uploadHeading: 'Upload a file',
-			uploadSubheading: 'You can drop your file right in this section',
 			uploadUrl: 'http://localhost:3000/convert/img',
-
+			showSidebar: false,
 			fileOptions: {
 				convertFrom: '',
 				convertTo: '',
@@ -88,9 +108,7 @@ export default {
 				keepAspectRatio: false,
 				imgFit: false,
 			},
-
 			filesReceived: [],
-
 			convertOptions,
 			fixedRatioOptions,
 		};
