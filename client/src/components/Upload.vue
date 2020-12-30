@@ -18,7 +18,7 @@
 				<p class="text-2xl font-semibold m-1">Upload</p>
 			</div>
 		</div>
-		<transition appear="true" name="footer-emerge">
+		<transition appear name="footer-emerge">
 			<div
 				v-if="loaded"
 				id="footer"
@@ -32,6 +32,7 @@
 				</div>
 				<button
 					class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:text-secondary transition-all"
+					@click="handleUploadFile"
 				>
 					<i class="far fa-paper-plane"></i> Upload
 				</button>
@@ -46,7 +47,7 @@ export default {
 		heading: String,
 		subheading: String,
 		uploadUrl: String,
-		uploadQuery: Object,
+		uploadQuery: String,
 	},
 
 	data() {
@@ -92,7 +93,15 @@ export default {
 			};
 		},
 
-		handleUploadFile() {},
+		async handleUploadFile() {
+			const url = this.uploadUrl + this.uploadQuery;
+			const payload = await this.buffer;
+			const options = { method: 'post', body: payload };
+			console.log(payload);
+
+			const response = await fetch(url, options);
+			console.log(response);
+		},
 	},
 };
 </script>
@@ -104,8 +113,9 @@ export default {
 .footer-emerge-leave-active {
 	transition: all 1s ease-in-out;
 }
-.footer-emerge-enter, .footer-emerge-leave-to {
-  transition: all 1s;
+.footer-emerge-enter,
+.footer-emerge-leave-to {
+	transition: all 1s;
 	transform: translateY(-10px);
 	opacity: 0;
 }

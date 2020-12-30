@@ -1,5 +1,5 @@
 <template
-	><transition appear="true" name="card-slide">
+	><transition appear name="card-slide">
 		<div
 			class="sm:block md:absolute top-6 right-4 border-l-4 px-4 py-2 mb-4 border-primary bg-gray-50 w-80 bg-opacity-95"
 		>

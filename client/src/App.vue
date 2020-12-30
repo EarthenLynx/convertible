@@ -30,6 +30,8 @@
 		<Upload
 			:heading="uploadHeading"
 			:subheading="uploadSubheading"
+			:uploadUrl="uploadUrl"
+			:uploadQuery="uploadQuery"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
 		/>
 		<section class="grid md:grid-cols-1 xl:grid-cols-2 gap-4 pt-4">
@@ -73,6 +75,7 @@ export default {
 		return {
 			uploadHeading: 'Upload a file',
 			uploadSubheading: 'You can drop your file right in this section',
+			uploadUrl: 'http://localhost:3000/convert/img',
 
 			fileOptions: {
 				convertFrom: '',
@@ -97,6 +100,35 @@ export default {
 				if (this.fileOptions[key]) modified = true;
 			});
 			return modified;
+		},
+
+		uploadQuery() {
+			let query = '?';
+			if (this.fileOptions.convertFrom) {
+				query += `convertFrom=${this.fileOptions.convertFrom}&`;
+			}
+			if (this.fileOptions.convertTo) {
+				query += `convertTo=${this.fileOptions.convertTo}&`;
+			}
+			if (this.fileOptions.fixedAspectRatio) {
+				query += `fixedAspectRatio=${this.fileOptions.fixedAspectRatio}&`;
+			}
+			if (this.fileOptions.qualityTo) {
+				query += `qualityTo=${this.fileOptions.qualityTo}&`;
+			}
+			if (this.fileOptions.heightTo) {
+				query += `heightTo=${this.fileOptions.heightTo}&`;
+			}
+			if (this.fileOptions.widthTo) {
+				query += `widthTo=${this.fileOptions.widthTo}&`;
+			}
+			if (this.fileOptions.keepAspectRatio) {
+				query += `keepAspectRatio=${this.fileOptions.keepAspectRatio}&`;
+			}
+			if (this.fileOptions.imgFit) {
+				query += `imgFit=${this.fileOptions.imgFit}&`;
+			}
+			return query;
 		},
 	},
 };
