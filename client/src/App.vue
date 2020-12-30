@@ -1,28 +1,30 @@
 <template>
 	<div id="app" class="md:w-4/5 xl:w-1/2 2xl:w-7/12 m-auto mt-6">
-		<app-card heading="Image settings">
+		<app-card v-if="settingsModified" heading="Image settings">
 			<ul>
-				<li v-if="convertFrom && convertTo">
-					Convert from <span class="font-medium text-primary">{{ convertFrom }}</span> into
-					<span class="font-medium text-primary">{{ convertTo }}</span>
+				<li v-if="fileOptions.convertFrom && fileOptions.convertTo">
+					Convert from <span class="font-medium text-primary">{{ fileOptions.convertFrom }}</span> into
+					<span class="font-medium text-primary">{{ fileOptions.convertTo }}</span>
 				</li>
-				<li v-if="fixedAspectRatio && convertFrom && convertTo">
+				<li v-if="fileOptions.fixedAspectRatio && fileOptions.convertFrom && fileOptions.convertTo">
 					... in
 					<span class="text-primary font-medium">
-						{{ fixedAspectRatio }}
+						{{ fileOptions.fixedAspectRatio }}
 					</span>
 					- format
 				</li>
-				<li v-if="heightTo || widthTo">
-					Target size <span class="font-medium">{{ heightTo }} x {{ widthTo }}px </span>
+				<li v-if="fileOptions.heightTo || fileOptions.widthTo">
+					Target size <span class="font-medium">{{ fileOptions.heightTo }} x {{ fileOptions.widthTo }}px </span>
 				</li>
-				<li v-if="qualityTo">
-					Quality: <span class="font-medium">{{ qualityTo }}%</span>
+				<li v-if="fileOptions.qualityTo">
+					Quality: <span class="font-medium">{{ fileOptions.qualityTo }}%</span>
 				</li>
-				<li v-if="keepAspectRatio">
+				<li v-if="fileOptions.keepAspectRatio">
 					<i class="fas fa-check text-green-700 mr-2"></i>Aspect ratio will remain the same
 				</li>
-				<li v-if="imgFit"><i class="fas fa-check text-green-700 mr-2"></i>Fitting background to image size</li>
+				<li v-if="fileOptions.imgFit">
+					<i class="fas fa-check text-green-700 mr-2"></i>Fitting background to image size
+				</li>
 			</ul>
 		</app-card>
 
@@ -49,20 +51,25 @@
 			subheading="You can drop your file right in this section"
 			:uploadUrl="uploadUrl"
 			:uploadQuery="uploadQuery"
-			@fileLoaded="convertFrom = $event.type"
+			@fileLoaded="fileOptions.convertFrom = $event.type"
 			@imageReceived="pushImage($event)"
 		/>
 
 		<!-- Form Section -->
 		<section class="grid md:grid-cols-1 xl:grid-cols-2 gap-4 pt-4">
-			<app-select name="Format" label="Format" @change="convertTo = $event" :options="convertOptions" />
-			<app-select name="Ratio" label="Fixed ratio" @change="fixedAspectRatio = $event" :options="fixedRatioOptions" />
-			<app-number name="Height" label="Height" :value="heightTo" @change="heightTo = $event"></app-number>
-			<app-number name="Width" label="Width" :value="widthTo" @change="widthTo = $event"></app-number>
-			<app-number name="Quality" label="Quality" :value="qualityTo" @change="qualityTo = $event"></app-number>
+			<app-select name="Format" label="Format" @change="fileOptions.convertTo = $event" :options="convertOptions" />
+			<app-select
+				name="Ratio"
+				label="Fixed ratio"
+				@change="fileOptions.fixedAspectRatio = $event"
+				:options="fixedRatioOptions"
+			/>
+			<app-number name="Height" label="Height" @change="fileOptions.heightTo = $event"></app-number>
+			<app-number name="Width" label="Width" @change="fileOptions.widthTo = $event"></app-number>
+			<app-number name="Quality" label="Quality" @change="fileOptions.qualityTo = $event"></app-number>
 			<div>
-				<app-switch label="Fixed ratio" @change="keepAspectRatio = $event"></app-switch>
-				<app-switch label="Fit background size" @change="imgFit = $event"></app-switch>
+				<app-switch label="Fixed ratio" @change="fileOptions.keepAspectRatio = $event"></app-switch>
+				<app-switch label="Fit background size" @change="fileOptions.imgFit = $event"></app-switch>
 			</div>
 		</section>
 	</div>
@@ -90,24 +97,21 @@ export default {
 
 	data() {
 		return {
-			// Form vars
-			convertFrom: '',
-			convertTo: '',
-			qualityTo: null,
-			heightTo: null,
-			widthTo: null,
-			fixedAspectRatio: '',
-			keepAspectRatio: false,
-			imgFit: false,
-
-			// Config vary
 			uploadUrl: 'http://localhost:3000/convert/img',
 			showSidebar: false,
+			fileOptions: {
+				convertFrom: '',
+				convertTo: '',
+				qualityTo: null,
+				heightTo: null,
+				widthTo: null,
+				fixedAspectRatio: '',
+				keepAspectRatio: false,
+				imgFit: false,
+			},
+			filesReceived: [],
 			convertOptions,
 			fixedRatioOptions,
-
-			// Others
-			filesReceived: [],
 		};
 	},
 
@@ -119,31 +123,39 @@ export default {
 	},
 
 	computed: {
+		settingsModified() {
+			let modified = false;
+			Object.keys(this.fileOptions).forEach(key => {
+				if (this.fileOptions[key]) modified = true;
+			});
+			return modified;
+		},
+
 		uploadQuery() {
 			let query = '?';
-			if (this.convertFrom) {
-				query += `convertFrom=${this.convertFrom}&`;
+			if (this.fileOptions.convertFrom) {
+				query += `convertFrom=${this.fileOptions.convertFrom}&`;
 			}
-			if (this.convertTo) {
-				query += `convertTo=${this.convertTo}&`;
+			if (this.fileOptions.convertTo) {
+				query += `convertTo=${this.fileOptions.convertTo}&`;
 			}
-			if (this.fixedAspectRatio) {
-				query += `fixedAspectRatio=${this.fixedAspectRatio}&`;
+			if (this.fileOptions.fixedAspectRatio) {
+				query += `fixedAspectRatio=${this.fileOptions.fixedAspectRatio}&`;
 			}
-			if (this.qualityTo) {
-				query += `qualityTo=${this.qualityTo}&`;
+			if (this.fileOptions.qualityTo) {
+				query += `qualityTo=${this.fileOptions.qualityTo}&`;
 			}
-			if (this.heightTo) {
-				query += `heightTo=${this.heightTo}&`;
+			if (this.fileOptions.heightTo) {
+				query += `heightTo=${this.fileOptions.heightTo}&`;
 			}
-			if (this.widthTo) {
-				query += `widthTo=${this.widthTo}&`;
+			if (this.fileOptions.widthTo) {
+				query += `widthTo=${this.fileOptions.widthTo}&`;
 			}
-			if (this.keepAspectRatio) {
-				query += `keepAspectRatio=${this.keepAspectRatio}&`;
+			if (this.fileOptions.keepAspectRatio) {
+				query += `keepAspectRatio=${this.fileOptions.keepAspectRatio}&`;
 			}
-			if (this.imgFit) {
-				query += `imgFit=${this.imgFit}&`;
+			if (this.fileOptions.imgFit) {
+				query += `imgFit=${this.fileOptions.imgFit}&`;
 			}
 			return query;
 		},
