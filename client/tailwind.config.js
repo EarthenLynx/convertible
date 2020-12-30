@@ -2,6 +2,12 @@ module.exports = {
 	purge: [],
 	darkMode: 'media', // or 'media' or 'class'
 	theme: {
+		textColor: theme => ({
+			...theme('colors'),
+			primary: '#4693c8',
+			secondary: '#9e4d90',
+		}),
+
 		backgroundColor: theme => ({
 			...theme('colors'),
 			primary: '#4693c8',
