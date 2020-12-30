@@ -1,5 +1,7 @@
 <template>
 	<div id="upload">
+
+		<!-- Upload dropdown section -->
 		<div id="wrapper" class="border rounded border-primary">
 			<div id="header" class="px-8 py-3 flex-row bg-gradient-to-br from-primary to-secondary ">
 				<h1 class="font-medium text-xl text-white">{{ heading }}</h1>
@@ -17,7 +19,9 @@
 				<i class="fas fa-file-upload text-4xl m-2"></i>
 				<p class="text-2xl font-semibold m-1">Upload</p>
 			</div>
-		</div>
+		</div
+		>
+		<!-- Footer -->
 		<transition appear name="footer-emerge">
 			<div
 				v-if="loaded"
@@ -38,6 +42,7 @@
 				</button>
 			</div>
 		</transition>
+
 	</div>
 </template>
 

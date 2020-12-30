@@ -9,19 +9,36 @@
 					@click="$emit('close')"
 				>
 					{{ heading }}
-					<i
-						class="fas fa-chevron-down text-white transform transition-all"
-						:class="{ 'rotate-90': closeHover }"
-					></i>
+					<i class="fas fa-chevron-down text-white transform transition-all" :class="{ 'rotate-90': closeHover }"></i>
 				</h2>
 				<p class="font-normal text-md text-white">{{ subheading }}</p>
 			</div>
-			<div class="w-auto h-5/6 overflow-auto py-3 px-4 ">
-				<div v-for="image in images" :key="image">
-					<div class="border rounded">
-						<img :src="image" class="" />
+			<!-- Image collection -->
+			<div class="w-auto h-5/6 overflow-y-scroll py-3 px-4 ">
+				<transition-group appear name="collection-slide">
+					<!-- Single image items -->
+					<div v-for="(image, index) in images" :key="image" class="border rounded my-2">
+						<div class="w-auto">
+							<img :src="image" />
+						</div>
+						<div class="px-2 py-3 flex justify-between">
+							<button
+								class="font-semibold text-secondary border-secondary px-4 py-1 hover:underline focus:outline-none"
+								@click="$emit('deleteImage', index)"
+							>
+								<i class="fas fa-eraser"></i> Delete
+							</button>
+							<a :href="image" download="image">
+								<button
+									class="border rounded font-semibold text-primary border-primary px-4 py-1 hover:bg-primary hover:text-white transition-all"
+								>
+									<i class="far fa-save"></i> Save
+								</button></a
+							>
+						</div>
 					</div>
-				</div>
+					<!-- /Single image items -->
+				</transition-group>
 			</div>
 		</section>
 	</transition>
@@ -54,5 +71,25 @@ export default {
 	transition: all 0.5s;
 	transform: translateX(-50px);
 	opacity: 0;
+}
+
+.collection-slide-enter {
+	transform: translateY(100px);
+	opacity: 0;
+}
+.collection-slide-enter-active {
+	transition: all 1s;
+}
+.collection-slide-leave-active {
+  z-index: -1;
+  width: 83%;
+	position: absolute;
+	transform: translateY(-100px);
+	transition: all 1s;
+	opacity: 0;
+}
+
+.collection-slide-move {
+	transition: all 1s;
 }
 </style>
