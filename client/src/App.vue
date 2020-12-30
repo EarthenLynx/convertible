@@ -1,5 +1,32 @@
 <template>
-	<div id="app" class="md:w-4/5 xl:w-3/5 2xl:w-1/2 m-auto mt-6">
+	<div id="app" class="md:w-4/5 xl:w-1/2 2xl:w-7/12 m-auto mt-6">
+		<app-card v-if="settingsModified" heading="Image settings">
+			<ul>
+				<li v-if="fileOptions.convertFrom && fileOptions.convertTo">
+					Convert from <span class="font-medium text-primary">{{ fileOptions.convertFrom }}</span> into
+					<span class="font-medium text-primary">{{ fileOptions.convertTo }}</span>
+				</li>
+				<li v-if="fileOptions.fixedAspectRatio && fileOptions.convertFrom && fileOptions.convertTo">
+					... in
+					<span class="text-primary font-medium">
+						{{ fileOptions.fixedAspectRatio }}
+					</span>
+					- format
+				</li>
+				<li v-if="fileOptions.heightTo || fileOptions.widthTo">
+					Target size <span class="font-medium">{{ fileOptions.heightTo }} x {{ fileOptions.widthTo }}px </span>
+				</li>
+				<li v-if="fileOptions.qualityTo">
+					Quality: <span class="font-medium">{{ fileOptions.qualityTo }}%</span>
+				</li>
+				<li v-if="fileOptions.keepAspectRatio">
+					<i class="fas fa-check text-green-700 mr-2"></i>Aspect ratio will remain the same
+				</li>
+				<li v-if="fileOptions.imgFit">
+					<i class="fas fa-check text-green-700 mr-2"></i>Fitting background to image size
+				</li>
+			</ul>
+		</app-card>
 		<Upload
 			:heading="uploadHeading"
 			:subheading="uploadSubheading"
@@ -29,6 +56,7 @@ import Upload from '@/components/Upload';
 import AppSelect from '@/components/AppSelect';
 import AppNumber from '@/components/AppNumberInput';
 import AppSwitch from '@/components/AppSwitch';
+import AppCard from '@/components/AppCard';
 import { convertOptions, fixedRatioOptions } from '@/config/options';
 
 export default {
@@ -38,6 +66,7 @@ export default {
 		AppSelect,
 		AppNumber,
 		AppSwitch,
+		AppCard,
 	},
 
 	data() {
@@ -48,9 +77,9 @@ export default {
 			fileOptions: {
 				convertFrom: '',
 				convertTo: '',
-				qualityTo: '',
-				heightTo: '',
-				widthTo: '',
+				qualityTo: null,
+				heightTo: null,
+				widthTo: null,
 				fixedAspectRatio: '',
 				keepAspectRatio: false,
 				imgFit: false,
@@ -61,7 +90,15 @@ export default {
 		};
 	},
 
-	methods: {},
+	computed: {
+		settingsModified() {
+			let modified = false;
+			Object.keys(this.fileOptions).forEach(key => {
+				if (this.fileOptions[key]) modified = true;
+			});
+			return modified;
+		},
+	},
 };
 </script>
 

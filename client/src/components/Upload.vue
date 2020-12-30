@@ -18,18 +18,25 @@
 				<p class="text-2xl font-semibold m-1">Upload</p>
 			</div>
 		</div>
-
-		<div v-if="loaded" id="footer" class="border border-primary rounded flex justify-between bg-gradient-to-r from-primary to-secondary my-4 px-8 py-2">
-			<div id="text-wrapper">
-				<p class="text-base text-white">{{ file.name }}</p>
-				<small class="text-xs opacity-75 text-white">Size: {{ file.size }} kb. Current format: {{ file.type }}. </small>
-			</div>
-			<button
-				class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:text-secondary transition-all"
+		<transition appear="true" name="footer-emerge">
+			<div
+				v-if="loaded"
+				id="footer"
+				class="border border-primary rounded flex justify-between bg-gradient-to-r from-primary to-secondary my-4 px-8 py-2"
 			>
-				<i class="far fa-paper-plane"></i> Upload
-			</button>
-		</div>
+				<div id="text-wrapper">
+					<p class="text-base text-white">{{ file.name }}</p>
+					<small class="text-xs opacity-75 text-white"
+						>Size: {{ file.size }} kb. Current format: {{ file.type }}.
+					</small>
+				</div>
+				<button
+					class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:text-secondary transition-all"
+				>
+					<i class="far fa-paper-plane"></i> Upload
+				</button>
+			</div>
+		</transition>
 	</div>
 </template>
 
@@ -68,6 +75,8 @@ export default {
 			const fileItem = event.dataTransfer.items[0].getAsFile();
 			const reader = new FileReader();
 
+			console.log(fileItem);
+
 			this.file = {
 				name: fileItem.name,
 				size: (fileItem.size / 1000).toFixed(2),
@@ -79,7 +88,7 @@ export default {
 				this.over = false;
 				this.loaded = true;
 				this.buffer = event.target.result;
-				this.$emit('fileLoaded', this.file)
+				this.$emit('fileLoaded', this.file);
 			};
 		},
 
@@ -88,4 +97,16 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.footer-emerge-enter-active {
+	transition: all 1s ease-in-out;
+}
+.footer-emerge-leave-active {
+	transition: all 1s ease-in-out;
+}
+.footer-emerge-enter, .footer-emerge-leave-to {
+  transition: all 1s;
+	transform: translateY(-10px);
+	opacity: 0;
+}
+</style>

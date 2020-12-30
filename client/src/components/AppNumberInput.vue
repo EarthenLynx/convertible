@@ -1,7 +1,7 @@
 <template>
 	<div class="flex border rounded border-primary">
 		<label class="p-2 w-1/3 text-center bg-primary text-white font-semibold">{{ label }}</label>
-		<input type="number" v-model="number" @change="$emit('change', number)" class="w-full rounded focus:outline-none focus:shadow-primary px-2">
+		<input type="number" v-model="value" @change="$emit('change', value)" class="w-full rounded focus:outline-none focus:shadow-primary px-2">
 	</div>
 </template>
 
@@ -9,7 +9,7 @@
 export default {
   data() {
     return {
-      number: 0
+      value: 0
     }
   },
 	props: {
