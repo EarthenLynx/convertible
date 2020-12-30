@@ -1,15 +1,15 @@
 <template>
 	<div id="upload">
-		<div id="wrapper" class="border rounded border-blue-900">
-			<div id="header" class="px-8 py-3 flex-row bg-blue-900">
-				<h1 class="font-medium text-xl text-white" >{{ heading }}</h1>
-				<p class="font-normal text-md text-white" >{{ subheading }}</p>
+		<div id="wrapper" class="border rounded border-primary">
+			<div id="header" class="px-8 py-3 flex-row bg-gradient-to-br from-primary to-secondary ">
+				<h1 class="font-medium text-xl text-white">{{ heading }}</h1>
+				<p class="font-normal text-md text-white">{{ subheading }}</p>
 			</div>
 
 			<div
 				id="body"
 				class="px-8 py-2 md:h-64 lg:h-80 flex flex-col justify-center items-center transition-all"
-				:class="{ 'bg-blue-900 text-indigo-400': over }"
+				:class="{ 'bg-primary text-indigo-400': over }"
 				@dragover.prevent="handleDragOver"
 				@dragleave.prevent="handleDragLeave"
 				@drop.prevent="handleDrop"
@@ -19,13 +19,13 @@
 			</div>
 		</div>
 
-		<div v-if="loaded" id="footer" class="border rounded flex justify-between bg-blue-900 my-4 px-8 py-2">
+		<div v-if="loaded" id="footer" class="border rounded flex justify-between bg-primary my-4 px-8 py-2">
 			<div id="text-wrapper">
 				<p class="text-base text-white">{{ file.name }}</p>
 				<small class="text-xs opacity-75 text-white">Size: {{ file.size }} kb. Current format: {{ file.type }}. </small>
 			</div>
 			<button
-				class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:shadow-md hover:text-blue-900 transition-all"
+				class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:shadow-md hover:text-primary transition-all"
 			>
 				<i class="far fa-paper-plane"></i> Upload
 			</button>
