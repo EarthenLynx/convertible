@@ -1,28 +1,29 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+	<div id="app" class="md:w-2/3 lg:w-2/5 m-auto mt-6">
+		<Upload
+      :heading="uploadHeading"
+      :subheading="uploadSubheading"
+    />
+	</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Upload from '@/components/Upload';
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+	name: 'App',
+	components: {
+		Upload,
+  },
+
+  data() {
+    return {
+      uploadHeading: 'Upload a file',
+      uploadSubheading: 'You can drop your file right in this section'
+    }
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
