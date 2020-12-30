@@ -97,10 +97,16 @@ export default {
 			const url = this.uploadUrl + this.uploadQuery;
 			const payload = await this.buffer;
 			const options = { method: 'post', body: payload };
-			console.log(payload);
 
 			const response = await fetch(url, options);
-			console.log(response);
+			if (response.status !== 200) {
+				const data = await response.json();
+				console.error(`${data}`);
+			} else {
+				const image = await response.blob();
+				const imageUrl = URL.createObjectURL(image);
+				this.$emit('imageReceived', imageUrl);
+			}
 		},
 	},
 };

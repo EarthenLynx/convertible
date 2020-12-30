@@ -33,6 +33,7 @@
 			:uploadUrl="uploadUrl"
 			:uploadQuery="uploadQuery"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
+			@imageReceived="filesReceived.push($event)"
 		/>
 		<section class="grid md:grid-cols-1 xl:grid-cols-2 gap-4 pt-4">
 			<app-select name="Format" label="Format" @change="fileOptions.convertTo = $event" :options="convertOptions" />
@@ -87,6 +88,8 @@ export default {
 				keepAspectRatio: false,
 				imgFit: false,
 			},
+
+			filesReceived: [],
 
 			convertOptions,
 			fixedRatioOptions,
