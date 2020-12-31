@@ -1,7 +1,7 @@
 <template>
 	<transition appear name="sidebar-slide">
 		<section class="absolute top-0 left-0 h-screen w-72">
-			<div class="w-auto h-1/6 px-4 py-6 bg-primary">
+			<div class="w-auto h-1/6 px-4 py-6 bg-primary z-10">
 				<h2
 					class="font-medium flex justify-between text-2xl cursor-pointer text-white"
 					@mouseenter="closeHover = true"
@@ -14,14 +14,14 @@
 				<p class="font-normal text-md text-white">{{ subheading }}</p>
 			</div>
 			<!-- Image collection -->
-			<div class="w-auto h-5/6 overflow-y-scroll py-3 px-4 ">
+			<div class="w-auto h-5/6 overflow-y-scroll py-3 px-4 bg-white">
 				<transition-group appear name="collection-slide">
 					<!-- Single image items -->
-					<div v-for="(image, index) in images" :key="image" class="border rounded my-2">
+					<div v-for="(image, index) in images" :key="image" class="border border-gray-200 rounded my-2">
 						<div class="w-auto">
-							<img :src="image" />
+							<img class="w-auto max-h-48 m-auto" :src="image" />
 						</div>
-						<div class="px-2 py-3 flex justify-between">
+						<div class="px-2 py-3 flex justify-between bg-gray-50 bg-opacity-95">
 							<button
 								class="font-semibold text-secondary border-secondary px-4 py-1 hover:underline focus:outline-none"
 								@click="$emit('deleteImage', index)"
@@ -74,19 +74,20 @@ export default {
 }
 
 .collection-slide-enter {
-	transform: translateY(100px);
+	transform: translateX(6rem) rotateY(90deg);
 	opacity: 0;
 }
 .collection-slide-enter-active {
 	transition: all 1s;
 }
 .collection-slide-leave-active {
-  z-index: -1;
+  /* z-index: -1; */
   width: 83%;
 	position: absolute;
-	transform: translateY(-100px);
+	transform: translateX(-6rem) rotateY(90deg) ;
 	transition: all 1s;
 	opacity: 0;
+
 }
 
 .collection-slide-move {
