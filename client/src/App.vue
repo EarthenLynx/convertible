@@ -53,6 +53,7 @@
 			:uploadQuery="uploadQuery"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
 			@imageReceived="pushImage($event)"
+			@imageError="handleAlertError($event)"
 		/>
 
 		<!-- Form Section -->
@@ -72,6 +73,7 @@
 				<app-switch label="Fit background size" @change="fileOptions.imgFit = $event"></app-switch>
 			</div>
 		</section>
+		<app-alert v-if="error.show" :msg="error.msg"></app-alert>
 	</div>
 </template>
 
@@ -82,6 +84,7 @@ import AppSelect from '@/components/AppSelect';
 import AppNumber from '@/components/AppNumberInput';
 import AppSwitch from '@/components/AppSwitch';
 import AppCard from '@/components/AppCard';
+import AppAlert from '@/components/AppAlert';
 import { convertOptions, fixedRatioOptions } from '@/config/options';
 
 export default {
@@ -93,11 +96,16 @@ export default {
 		AppNumber,
 		AppSwitch,
 		AppCard,
+		AppAlert,
 	},
 
 	data() {
 		return {
 			uploadUrl: 'http://localhost:3000/convert/img',
+			error: {
+				msg: '',
+				show: false,
+			},
 			showSidebar: false,
 			fileOptions: {
 				convertFrom: '',
@@ -119,6 +127,11 @@ export default {
 		pushImage(url) {
 			this.filesReceived.push(url);
 			this.showSidebar = true;
+		},
+		handleAlertError(errorMsg) {
+			this.error.msg = errorMsg;
+			this.error.show = true;
+			setTimeout(() => (this.error.show = false), 4000);
 		},
 	},
 

@@ -100,13 +100,15 @@ export default {
 
 		async handleUploadFile() {
 			const url = this.uploadUrl + this.uploadQuery;
+
+			// Do basic validation to check if relevant params are submitted
 			const payload = await this.buffer;
 			const options = { method: 'post', body: payload };
 
 			const response = await fetch(url, options);
 			if (response.status !== 200) {
-				const data = await response.json();
-				console.error(`${data}`);
+				const errorMsg = await response.json();
+				this.$emit('imageError', errorMsg.error)
 			} else {
 				const image = await response.blob();
 				const imageUrl = URL.createObjectURL(image);

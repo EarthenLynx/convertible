@@ -20,6 +20,10 @@ module.exports = {
 
 	fixedRatioOptions: [
 		{
+			key: undefined,
+			value: 'Manual'
+		},
+		{
 			key: 'hd',
 			value: 'Landscape 16:9 format',
 		},

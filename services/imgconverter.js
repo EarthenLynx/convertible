@@ -89,7 +89,7 @@ const convertImg = (img, convertTo, qualityTo) => {
 			return img.jpeg(formatOptions);
 
 		default:
-			break;
+			throw new Error('This image format is not supported. Supported formats are "webp", "png" or "jpg"');
 	}
 };
 
@@ -109,7 +109,6 @@ const convertImgService = async (req, res) => {
 		pathFrom = await uploadImg(req, `${pathFrom}.${convertFrom}`);
 
 		// Start img processing, load relevant metadata and img itself
-		console.log(await sharp(pathFrom).metadata());
 		const { width: widthFrom, height: heightFrom } = await sharp(pathFrom).metadata();
 		let img = sharp(pathFrom);
 
