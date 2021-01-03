@@ -103,7 +103,7 @@ export default {
 
 	data() {
 		return {
-			uploadUrl: '/convert/img',
+			uploadUrl: 'http://localhost:9000/convert/img',
 			error: {
 				msg: '',
 				show: false,

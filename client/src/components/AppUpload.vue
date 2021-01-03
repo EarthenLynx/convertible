@@ -15,8 +15,11 @@
 				@dragleave.prevent="handleDragLeave"
 				@drop.prevent="handleDrop"
 			>
-				<i class="fas fa-file-upload text-4xl m-2"></i>
-				<p class="text-2xl font-semibold m-1">Upload</p>
+				<label for="fileupload" class="flex flex-col justify-center items-center cursor-pointer transition-all hover:text-primary"
+					><i class="fas fa-file-upload text-4xl"></i>
+					<p class="text-2xl font-semibold">Upload</p></label
+				>
+				<input class="hidden" type="file" name="fileupload" id="fileupload" @change="handleFileInput" />
 			</div>
 		</div>
 		<!-- Footer -->
@@ -77,6 +80,30 @@ export default {
 
 		handleDrop(event) {
 			const fileItem = event.dataTransfer.items[0].getAsFile();
+			const reader = new FileReader();
+
+			if (this.allowedFormats.length > 0 && !this.allowedFormats.includes(fileItem.type.split('/')[0])) {
+				this.over = false;
+				this.loaded = true;
+				this.$emit('fileIllegalFormat', `Filetype ${fileItem.type} not supported.`);
+			} else {
+				this.file = {
+					name: fileItem.name,
+					size: (fileItem.size / 1000).toFixed(2),
+					type: fileItem.type.split('/')[1],
+				};
+				reader.readAsArrayBuffer(fileItem);
+				reader.onloadend = event => {
+					this.over = false;
+					this.loaded = true;
+					this.buffer = event.target.result;
+					this.$emit('fileLoaded', this.file);
+				};
+			}
+		},
+
+		handleFileInput(event) {
+			const fileItem = event.target.files[0];
 			const reader = new FileReader();
 
 			if (this.allowedFormats.length > 0 && !this.allowedFormats.includes(fileItem.type.split('/')[0])) {
