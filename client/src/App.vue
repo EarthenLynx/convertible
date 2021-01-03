@@ -1,27 +1,39 @@
 <template>
 	<div id="app" class="md:w-4/5 xl:w-1/2 2xl:w-7/12 m-auto mt-6">
+		<!-- Card to the fileOptions data to the user -->
 		<app-card v-if="settingsModified" heading="Image settings">
 			<ul>
+				<!-- Format from - and into which to convert -->
 				<li v-if="fileOptions.convertFrom && fileOptions.convertTo">
 					Convert from <span class="font-medium text-primary">{{ fileOptions.convertFrom }}</span> into
 					<span class="font-medium text-primary">{{ fileOptions.convertTo }}</span>
 				</li>
+
+				<!-- Whether to use one of the four fixed aspect ratio options, see config/options.js -> fixedRatioOptions -->
 				<li v-if="fileOptions.fixedAspectRatio && fileOptions.convertFrom && fileOptions.convertTo">
-					... in
+					... into
 					<span class="text-primary font-medium">
 						{{ fileOptions.fixedAspectRatio }}
 					</span>
 					- format
 				</li>
+
+				<!-- Target size of the output image -->
 				<li v-if="fileOptions.heightTo || fileOptions.widthTo">
 					Target size <span class="font-medium">{{ fileOptions.heightTo }} x {{ fileOptions.widthTo }}px </span>
 				</li>
+
+				<!-- Target quality to the output image -->
 				<li v-if="fileOptions.qualityTo">
 					Quality: <span class="font-medium">{{ fileOptions.qualityTo }}%</span>
 				</li>
+
+				<!-- Whether to keep the aspect ratio of the source image -->
 				<li v-if="fileOptions.keepAspectRatio">
 					<i class="fas fa-check text-green-700 mr-2"></i>Aspect ratio will remain the same
 				</li>
+
+				<!-- Whether to fit the image size in case target image would be cropped -->
 				<li v-if="fileOptions.imgFit">
 					<i class="fas fa-check text-green-700 mr-2"></i>Fitting background to image size
 				</li>
@@ -49,32 +61,34 @@
 		<app-upload
 			heading="Upload a file"
 			subheading="You can drop your file right in this section"
+			:allowedFormats="allowedFormats"
 			:uploadUrl="uploadUrl"
 			:uploadQuery="uploadQuery"
-			:allowedFormats="allowedFormats"
-			@fileLoaded="fileOptions.convertFrom = $event.type"
+			@fileLoaded="handleFileLoaded($event)"
 			@fileError="handleAlertError($event)"
 			@imageReceived="pushImage($event)"
 			@imageError="handleAlertError($event)"
 		/>
 
-		<!-- Form Section -->
+		<!-- Form Section to modify fileOptions properties -->
 		<section class="grid md:grid-cols-1 xl:grid-cols-2 gap-4 pt-4">
-			<app-select name="Format" label="Format" @change="fileOptions.convertTo = $event" :options="convertOptions" />
+			<app-select name="Format" label="Format" :options="convertOptions" @change="fileOptions.convertTo = $event" />
 			<app-select
 				name="Ratio"
 				label="Fixed ratio"
-				@change="fileOptions.fixedAspectRatio = $event"
 				:options="fixedRatioOptions"
+				@change="fileOptions.fixedAspectRatio = $event"
 			/>
 			<app-number name="Height" label="Height" @change="fileOptions.heightTo = $event"></app-number>
 			<app-number name="Width" label="Width" @change="fileOptions.widthTo = $event"></app-number>
-			<app-select name="Quality" label="Quality" @change="fileOptions.qualityTo = $event" :options="qualityOptions" />
+			<app-select name="Quality" label="Quality" :options="qualityOptions" @change="fileOptions.qualityTo = $event" />
 			<div>
 				<app-switch label="Fixed ratio" @change="fileOptions.keepAspectRatio = $event"></app-switch>
 				<app-switch label="Fit background size" @change="fileOptions.imgFit = $event"></app-switch>
 			</div>
 		</section>
+
+		<!-- An alert to indicate an API or Application error -->
 		<app-alert v-if="error.show" :msg="error.msg"></app-alert>
 	</div>
 </template>
@@ -103,13 +117,17 @@ export default {
 
 	data() {
 		return {
-			uploadUrl: '/convert/img',
+			// Global app settings
 			error: {
 				msg: '',
 				show: false,
 			},
 			showSidebar: false,
+			allowedFormats: ['image'],
+
+			// File specific settings
 			fileOptions: {
+				name: '',
 				convertFrom: '',
 				convertTo: '',
 				qualityTo: null,
@@ -119,7 +137,6 @@ export default {
 				keepAspectRatio: false,
 				imgFit: false,
 			},
-			allowedFormats: ['image'],
 			filesReceived: [],
 			convertOptions,
 			fixedRatioOptions,
@@ -127,19 +144,8 @@ export default {
 		};
 	},
 
-	methods: {
-		pushImage(url) {
-			this.filesReceived.push(url);
-			this.showSidebar = true;
-		},
-		handleAlertError(errorMsg) {
-			this.error.msg = errorMsg;
-			this.error.show = true;
-			setTimeout(() => (this.error.show = false), 4000);
-		},
-	},
-
 	computed: {
+		// Indicate if an image has been uploaded or any user input has been registered
 		settingsModified() {
 			let modified = false;
 			Object.keys(this.fileOptions).forEach(key => {
@@ -148,6 +154,12 @@ export default {
 			return modified;
 		},
 
+		// Define the upload endpoint based on environment
+		uploadUrl() {
+			return process.env.ENVIRONMENT === 'development' ? 'http://localhost:9000/convert/img' : '/convert/img';
+		},
+
+		// Define the upload query based on user input
 		uploadQuery() {
 			let query = '?';
 			if (this.fileOptions.convertFrom) {
@@ -175,6 +187,33 @@ export default {
 				query += `imgFit=${this.fileOptions.imgFit}&`;
 			}
 			return query;
+		},
+	},
+
+	methods: {
+		// Get name and extension of the uploaded file
+		handleFileLoaded(filedata) {
+			this.fileOptions.name = filedata.name;
+			this.fileOptions.convertFrom = filedata.type;
+		},
+
+		// Adds an image to the collection -> and to the sidebar
+		pushImage(url) {
+			const options = this.fileOptions;
+			const img = {
+				name: options.name.split('.')[0],
+				type: options.convertTo || options.convertFrom,
+				url,
+			};
+			this.filesReceived.push(img);
+			this.showSidebar = true;
+		},
+
+		// Helper for when error events are caught from a child component
+		handleAlertError(errorMsg) {
+			this.error.msg = errorMsg;
+			this.error.show = true;
+			setTimeout(() => (this.error.show = false), 4000);
 		},
 	},
 };
