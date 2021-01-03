@@ -7,6 +7,7 @@
 				<p class="font-normal text-md text-white">{{ subheading }}</p>
 			</div>
 
+			<!-- This is the drag & drop zone -->
 			<div
 				id="body"
 				class="px-8 py-2 md:h-64 lg:h-80 flex flex-col text-secondary justify-center items-center transition-all"
@@ -21,10 +22,11 @@
 					><i class="fas fa-file-upload text-4xl"></i>
 					<p class="text-2xl font-semibold">Upload</p></label
 				>
-				<input class="hidden" type="file" name="fileupload" id="fileupload" @change="handleFileInput" />
+				<input id="fileupload" class="hidden" type="file" name="fileupload" @change="handleFileInput" />
 			</div>
 		</div>
-		<!-- Footer -->
+
+		<!-- Footer is only shown after the user inputs a file -->
 		<transition appear name="footer-emerge">
 			<div
 				v-if="loaded"
@@ -38,10 +40,12 @@
 					</small>
 				</div>
 				<button
-					:disabled="processing"
 					class="w-28 border rounded font-semibold text-white border-white-400 px-4 "
+					:disabled="processing"
 					@click="handleUploadFile"
 				>
+					<!-- When uploading a file, display this svg spinner -->
+					<!-- If you'd like to know where I got the spinner, check https://loading.io/css/ -->
 					<svg
 						v-if="processing"
 						xmlns="http://www.w3.org/2000/svg"
@@ -80,6 +84,7 @@
 
 <script>
 export default {
+	name: 'AppUpload',
 	props: {
 		heading: String,
 		subheading: String,
@@ -103,6 +108,7 @@ export default {
 	},
 
 	methods: {
+		// Drag & Drop methods
 		handleDragOver() {
 			this.over = true;
 		},
@@ -111,6 +117,7 @@ export default {
 			this.over = false;
 		},
 
+		// Process the dropped file and emit it back to the parent component as an ArrayBuffer
 		handleDrop(event) {
 			const fileItem = event.dataTransfer.items[0].getAsFile();
 			const reader = new FileReader();
@@ -135,6 +142,7 @@ export default {
 			}
 		},
 
+		// Process the selected file and emit it back to the parent component as an ArrayBuffer
 		handleFileInput(event) {
 			const fileItem = event.target.files[0];
 			const reader = new FileReader();
@@ -159,6 +167,7 @@ export default {
 			}
 		},
 
+		// Upload a file and pass the server response back to the parent component
 		async handleUploadFile() {
 			this.processing = true;
 			const url = this.uploadUrl + this.uploadQuery;
@@ -178,12 +187,13 @@ export default {
 					this.$emit('imageReceived', imageUrl);
 				}
 			} catch (e) {
-				this.$emit('fileError', `Could not upload file: ${e}`)
+				this.$emit('fileError', `Could not upload file: ${e}`);
 			} finally {
 				this.processing = false;
 			}
 		},
 
+		// Helper methods
 		checkAllowedFormats(filetype, allowedFiletypes) {
 			return allowedFiletypes.includes(filetype) ? true : false;
 		},
@@ -192,6 +202,7 @@ export default {
 </script>
 
 <style scoped>
+/* Transition classes */
 .footer-emerge-enter-active {
 	transition: all 1s ease-in-out;
 }
