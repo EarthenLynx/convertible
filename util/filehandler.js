@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+
 // Create a writestream and temporarily save the img
 const uploadImg = (req, path) => {
 	return new Promise((resolve, reject) => {
