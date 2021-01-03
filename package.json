@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build-full": "cd client && npm run build-full && cd .. && npm install && npm start",
+    "build-full": "git pull && cd client && npm run build-full && cd .. && npm install && npm start",
     "start": "pm2 start app.js -n Convertible9000 && pm2 monit",
     "dev": "nodemon app.js"
   },
