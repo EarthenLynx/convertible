@@ -69,7 +69,7 @@
 			/>
 			<app-number name="Height" label="Height" @change="fileOptions.heightTo = $event"></app-number>
 			<app-number name="Width" label="Width" @change="fileOptions.widthTo = $event"></app-number>
-			<app-number name="Quality" label="Quality" @change="fileOptions.qualityTo = $event"></app-number>
+			<app-select name="Quality" label="Quality" @change="fileOptions.qualityTo = $event" :options="qualityOptions" />
 			<div>
 				<app-switch label="Fixed ratio" @change="fileOptions.keepAspectRatio = $event"></app-switch>
 				<app-switch label="Fit background size" @change="fileOptions.imgFit = $event"></app-switch>
@@ -87,7 +87,7 @@ import AppNumber from '@/components/AppNumberInput';
 import AppSwitch from '@/components/AppSwitch';
 import AppCard from '@/components/AppCard';
 import AppAlert from '@/components/AppAlert';
-import { convertOptions, fixedRatioOptions } from '@/config/options';
+import { convertOptions, fixedRatioOptions, qualityOptions } from '@/config/options';
 
 export default {
 	name: 'App',
@@ -123,6 +123,7 @@ export default {
 			filesReceived: [],
 			convertOptions,
 			fixedRatioOptions,
+			qualityOptions,
 		};
 	},
 
