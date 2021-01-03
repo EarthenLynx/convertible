@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "cd client && npm run build",
-    "start": "node app.js",
+    "build-full": "cd client && npm run build-full && cd .. && npm install && npm start",
+    "start": "pm2 start app.js -n Convertible9000 && pm2 monit",
     "dev": "nodemon app.js"
   },
   "dependencies": {

@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 });
 
 // Set a static folder
-app.use(express.static('publicbu'));
+app.use(express.static('public'));
 
 // Configure the view routes
 app.get('/', (req, res) => res.render('upload'));
