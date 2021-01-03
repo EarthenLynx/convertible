@@ -15,7 +15,9 @@
 				@dragleave.prevent="handleDragLeave"
 				@drop.prevent="handleDrop"
 			>
-				<label for="fileupload" class="flex flex-col justify-center items-center cursor-pointer transition-all hover:text-primary"
+				<label
+					for="fileupload"
+					class="flex flex-col justify-center items-center cursor-pointer transition-all hover:text-primary"
 					><i class="fas fa-file-upload text-4xl"></i>
 					<p class="text-2xl font-semibold">Upload</p></label
 				>
@@ -36,10 +38,40 @@
 					</small>
 				</div>
 				<button
-					class="border rounded font-semibold text-white border-white-400 px-4 hover:bg-white hover:text-secondary transition-all"
+					:disabled="processing"
+					class="w-28 border rounded font-semibold text-white border-white-400 px-4 "
 					@click="handleUploadFile"
 				>
-					<i class="far fa-paper-plane"></i> Upload
+					<svg
+						v-if="processing"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						style="margin: auto; background: none; display: block; shape-rendering: auto;"
+						width="30px"
+						height="30px"
+						viewBox="0 0 100 100"
+						preserveAspectRatio="xMidYMid"
+					>
+						<circle
+							cx="50"
+							cy="50"
+							fill="none"
+							stroke="#fff"
+							stroke-width="10"
+							r="40"
+							stroke-dasharray="188.49555921538757 64.83185307179586"
+						>
+							<animateTransform
+								attributeName="transform"
+								type="rotate"
+								repeatCount="indefinite"
+								dur="0.75s"
+								values="0 50 50;360 50 50"
+								keyTimes="0;1"
+							></animateTransform>
+						</circle>
+					</svg>
+					<span v-else> <i class="far fa-paper-plane"></i> Upload </span>
 				</button>
 			</div>
 		</transition>
@@ -60,6 +92,7 @@ export default {
 		return {
 			over: false,
 			loaded: false,
+			processing: false,
 			file: {
 				name: '',
 				size: '',
@@ -127,6 +160,7 @@ export default {
 		},
 
 		async handleUploadFile() {
+			this.processing = true;
 			const url = this.uploadUrl + this.uploadQuery;
 
 			// Do basic validation to check if relevant params are submitted
@@ -142,6 +176,7 @@ export default {
 				const imageUrl = URL.createObjectURL(image);
 				this.$emit('imageReceived', imageUrl);
 			}
+			this.processing = false;
 		},
 
 		checkAllowedFormats(filetype, allowedFiletypes) {
