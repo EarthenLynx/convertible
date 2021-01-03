@@ -142,7 +142,7 @@ export default {
 			if (this.allowedFormats.length > 0 && !this.allowedFormats.includes(fileItem.type.split('/')[0])) {
 				this.over = false;
 				this.loaded = true;
-				this.$emit('fileIllegalFormat', `Filetype ${fileItem.type} not supported.`);
+				this.$emit('fileError', `Filetype ${fileItem.type} not supported.`);
 			} else {
 				this.file = {
 					name: fileItem.name,
@@ -167,16 +167,21 @@ export default {
 			const payload = await this.buffer;
 			const options = { method: 'post', body: payload };
 
-			const response = await fetch(url, options);
-			if (response.status !== 200) {
-				const errorMsg = await response.json();
-				this.$emit('imageError', errorMsg.error);
-			} else {
-				const image = await response.blob();
-				const imageUrl = URL.createObjectURL(image);
-				this.$emit('imageReceived', imageUrl);
+			try {
+				const response = await fetch(url, options);
+				if (response.status !== 200) {
+					const errorMsg = await response.json();
+					this.$emit('imageError', errorMsg.error);
+				} else {
+					const image = await response.blob();
+					const imageUrl = URL.createObjectURL(image);
+					this.$emit('imageReceived', imageUrl);
+				}
+			} catch (e) {
+				this.$emit('fileError', `Could not upload file: ${e}`)
+			} finally {
+				this.processing = false;
 			}
-			this.processing = false;
 		},
 
 		checkAllowedFormats(filetype, allowedFiletypes) {

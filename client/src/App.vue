@@ -53,7 +53,7 @@
 			:uploadQuery="uploadQuery"
 			:allowedFormats="allowedFormats"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
-			@fileIllegalFormat="handleAlertError($event)"
+			@fileError="handleAlertError($event)"
 			@imageReceived="pushImage($event)"
 			@imageError="handleAlertError($event)"
 		/>
