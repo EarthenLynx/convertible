@@ -17,9 +17,10 @@
 			<div class="w-auto h-5/6 overflow-y-scroll py-3 px-4 bg-white">
 				<transition-group appear name="collection-slide">
 					<!-- Single image items -->
-					<div v-for="(image, index) in images" :key="image" class="border border-gray-200 rounded my-2">
-						<div class="w-auto">
-							<img class="w-auto max-h-48 m-auto" :src="image" />
+					<div v-for="(image, index) in images" :key="image.url" class="border border-gray-200 rounded my-2">
+						<div class="w-auto block">
+							<img class="w-auto max-h-48 m-auto" :src="image.url" />
+							<small class="block mx-4 my-2">{{image.name}}.{{image.type}}</small>
 						</div>
 						<div class="px-2 py-3 flex justify-between bg-gray-50 bg-opacity-95">
 							<button
@@ -28,7 +29,7 @@
 							>
 								<i class="fas fa-eraser"></i> Delete
 							</button>
-							<a :href="image" download="image">
+							<a :href="image.url" :download="`${image.name}.${image.type}`">
 								<button
 									class="border rounded font-semibold text-primary border-primary px-4 py-1 hover:bg-primary hover:text-white transition-all"
 								>
