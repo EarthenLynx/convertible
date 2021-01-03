@@ -1,6 +1,5 @@
 <template>
 	<div id="upload">
-
 		<!-- Upload dropdown section -->
 		<div id="wrapper" class="border rounded border-primary">
 			<div id="header" class="px-8 py-3 flex-row bg-gradient-to-br from-primary to-secondary ">
@@ -19,8 +18,7 @@
 				<i class="fas fa-file-upload text-4xl m-2"></i>
 				<p class="text-2xl font-semibold m-1">Upload</p>
 			</div>
-		</div
-		>
+		</div>
 		<!-- Footer -->
 		<transition appear name="footer-emerge">
 			<div
@@ -42,7 +40,6 @@
 				</button>
 			</div>
 		</transition>
-
 	</div>
 </template>
 
@@ -53,6 +50,7 @@ export default {
 		subheading: String,
 		uploadUrl: String,
 		uploadQuery: String,
+		allowedFormats: Array,
 	},
 
 	data() {
@@ -81,21 +79,24 @@ export default {
 			const fileItem = event.dataTransfer.items[0].getAsFile();
 			const reader = new FileReader();
 
-			console.log(fileItem);
-
-			this.file = {
-				name: fileItem.name,
-				size: (fileItem.size / 1000).toFixed(2),
-				type: fileItem.type.split('/')[1],
-			};
-
-			reader.readAsArrayBuffer(fileItem);
-			reader.onloadend = event => {
+			if (this.allowedFormats.length > 0 && !this.allowedFormats.includes(fileItem.type.split('/')[0])) {
 				this.over = false;
 				this.loaded = true;
-				this.buffer = event.target.result;
-				this.$emit('fileLoaded', this.file);
-			};
+				this.$emit('fileIllegalFormat', `Filetype ${fileItem.type} not supported.`);
+			} else {
+				this.file = {
+					name: fileItem.name,
+					size: (fileItem.size / 1000).toFixed(2),
+					type: fileItem.type.split('/')[1],
+				};
+				reader.readAsArrayBuffer(fileItem);
+				reader.onloadend = event => {
+					this.over = false;
+					this.loaded = true;
+					this.buffer = event.target.result;
+					this.$emit('fileLoaded', this.file);
+				};
+			}
 		},
 
 		async handleUploadFile() {
@@ -108,12 +109,16 @@ export default {
 			const response = await fetch(url, options);
 			if (response.status !== 200) {
 				const errorMsg = await response.json();
-				this.$emit('imageError', errorMsg.error)
+				this.$emit('imageError', errorMsg.error);
 			} else {
 				const image = await response.blob();
 				const imageUrl = URL.createObjectURL(image);
 				this.$emit('imageReceived', imageUrl);
 			}
+		},
+
+		checkAllowedFormats(filetype, allowedFiletypes) {
+			return allowedFiletypes.includes(filetype) ? true : false;
 		},
 	},
 };

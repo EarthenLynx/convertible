@@ -51,7 +51,9 @@
 			subheading="You can drop your file right in this section"
 			:uploadUrl="uploadUrl"
 			:uploadQuery="uploadQuery"
+			:allowedFormats="allowedFormats"
 			@fileLoaded="fileOptions.convertFrom = $event.type"
+			@fileIllegalFormat="handleAlertError($event)"
 			@imageReceived="pushImage($event)"
 			@imageError="handleAlertError($event)"
 		/>
@@ -117,6 +119,7 @@ export default {
 				keepAspectRatio: false,
 				imgFit: false,
 			},
+			allowedFormats: ['image'],
 			filesReceived: [],
 			convertOptions,
 			fixedRatioOptions,
