@@ -91,6 +91,6 @@ export default {
 }
 
 .collection-slide-move {
-	transition: all 1s;
+	transition: all .75s;
 }
 </style>
