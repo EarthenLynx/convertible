@@ -42,7 +42,6 @@ export default {
       type: String,
       default: "",
     },
-
     options: {
       type: Array,
       required: true,

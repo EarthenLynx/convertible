@@ -17,20 +17,22 @@ const routes = [
     component: About
   },
   {
+    path: '/upload',
+    name: 'Upload',
+    component: Upload
+  },
+  {
     path: '/convert',
     name: 'Convert',
-    component: Convert
+    component: Convert,
+
   },
   {
     path: '/gallery',
     name: 'Gallery',
-    component: Gallery
+    component: Gallery,
+
   },
-  {
-    path: '/upload',
-    name: 'Upload',
-    component: Upload
-  }
 ]
 
 const router = createRouter({
