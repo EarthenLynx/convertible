@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <label v-if="label">{{ label }}</label>
+  <div class="input-group">
+    <label class="input-label" v-if="label">{{ label }}</label>
     <select
       :value="modelValue"
-      class="field"
+      class="input-field"
       v-bind="{
         ...$attrs,
         onChange: ($event) => $emit('update:modelValue', $event.target.value),
@@ -42,6 +42,7 @@ export default {
       type: String,
       default: "",
     },
+
     options: {
       type: Array,
       required: true,
@@ -58,5 +59,18 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.input-group {
+  @apply block my-2;
+}
+
+.input-label {
+  @apply block mb-2 text-dark-primary;
+  @apply dark:text-dark-secondary;
+}
+
+.input-field {
+  @apply block py-2 px-2 rounded w-full border-2 border-gray-200 transition-all bg-transparent;
+  @apply focus:border-primary focus:outline-none;
+}
 </style>
