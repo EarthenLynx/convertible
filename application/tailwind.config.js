@@ -1,23 +1,33 @@
 module.exports = {
   purge: { content: ['./public/**/*.html', './src/**/*.vue'] },
-  darkMode: 'media', // or 'media' or 'class'
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
     textColor: theme => ({
       ...theme('colors'),
       primary: '#4693c8',
       secondary: '#9e4d90',
+      'dark-primary': '#22303C',
+      'dark-secondary': '#fefefe',
+      'dark-accent': '#8899A6'
     }),
 
     backgroundColor: theme => ({
       ...theme('colors'),
       primary: '#4693c8',
       secondary: '#9e4d90',
+      dark: '#15202b',
+      'dark-primary': '#22303C',
+      'dark-secondary': '#fefefe',
+      'dark-accent': '#8899A6'
     }),
 
     borderColor: theme => ({
       ...theme('colors'),
       primary: '#4693c8',
       secondary: '#9e4d90',
+      'dark-primary': '#22303C',
+      'dark-secondary': '#fefefe',
+      'dark-accent': '#8899A6'
     }),
 
     gradientColorStops: theme => ({

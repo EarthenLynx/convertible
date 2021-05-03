@@ -1,30 +1,47 @@
 <template>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <div>
+      <router-link :to="{ name: 'Home' }">Home</router-link>
+      <router-link :to="{ name: 'Upload' }">Upload</router-link>
+      <router-link :to="{ name: 'Gallery' }">Gallery</router-link>
+      <router-link :to="{ name: 'About' }">About</router-link>
+    </div>
+    <div>
+      <app-theme-button @click="toggleDarkTheme">Toggle Theme</app-theme-button>
+    </div>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
+<script>
+import AppThemeButton from '@/components/Buttons/AppThemeButton.vue'
+export default {
+  components: {
+    AppThemeButton
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+body {
+  transition: all 0.35s;
+  @apply bg-gray-50;
+  @apply dark:bg-dark-primary;
 }
 
 #nav {
-  padding: 30px;
+  transition: all 0.35s;
+  @apply flex justify-between items-center px-6 lg:px-16 py-6 bg-opacity-90 bg-secondary;
+  @apply dark:bg-dark;
 }
 
 #nav a {
-  font-weight: bold;
-  color: #2c3e50;
+  @apply text-white font-semibold px-2 transition-opacity opacity-80;
 }
 
+#nav a:hover,
 #nav a.router-link-exact-active {
-  color: #42b983;
+  @apply opacity-100 transition-opacity;
+  @apply dark:text-primary;
 }
 </style>
