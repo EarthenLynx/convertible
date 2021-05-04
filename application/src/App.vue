@@ -50,4 +50,22 @@ body {
   @apply opacity-100 transition-opacity;
   @apply dark:text-primary;
 }
+
+/* Transitions */
+.slideup-enter,
+.slideup-leave-to {
+  opacity: 0;
+  transition: all 1s ease;
+  transform: translateY(10px);
+}
+
+.slideup-leave-active {
+  transform: translateX(-10px);
+  transition: all 1s ease;
+  @apply absolute w-full;
+}
+
+.slideup-move {
+  transition: all 0.75s;
+}
 </style>

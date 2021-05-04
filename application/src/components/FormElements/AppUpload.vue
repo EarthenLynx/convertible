@@ -8,8 +8,8 @@
     <div class="upload-wrapper">
       <div id="header" class="upload-header">
         <h1 class="text-xl">
-          {{ heading }} or
-          <label for="fileupload" class="upload-label"> Browse</label>
+          {{ heading }}
+          <label for="fileupload" class="upload-label">or Browse</label>
           <input
             id="fileupload"
             class="hidden"
@@ -22,13 +22,18 @@
       </div>
 
       <main
-        v-if="fileItems.length > 0"
-        class="upload-body"
+        class="upload-body relative"
         :class="{ 'bg-white animate-pulse': over }"
       >
-        <app-upload-item v-for="file in fileItems" :key="file.name" :file="file" />
+        <transition-group name="slideup" tag="ul" appear>
+          <app-upload-item
+            v-for="(file, index) in fileItems"
+            :key="file.name"
+            :file="file"
+            @FileClose="onFileClose(index)"
+          />
+        </transition-group>
       </main>
-      {{file}}
       <div class="upload-footer">
         <app-button>Add to gallery</app-button>
       </div>
@@ -128,6 +133,10 @@ export default {
       return files;
     },
 
+    onFileClose(index) {
+      this.fileItems.splice(index, 1);
+    },
+
     // Upload a file and pass the server response back to the parent component
     async handleUploadFile() {
       this.processing = true;
@@ -170,7 +179,6 @@ export default {
 
 .upload-header {
   @apply text-center m-2 p-8 text-xl text-primary border-2 rounded border-dashed border-primary;
-  @apply dark:border-dark-accent;
 }
 
 .upload-body {
