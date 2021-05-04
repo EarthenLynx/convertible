@@ -1,9 +1,25 @@
 <template>
-  <div>This is the upload section</div>
+  <div class="container m-auto">
+    <app-upload heading="Upload a file here" @fileError="handleFileError" @fileLoaded="handleFileLoaded"></app-upload>
+  </div>
 </template>
 
 <script>
-export default {};
+import AppUpload from '@/components/FormElements/AppUpload.vue'
+export default {
+  components: {
+    AppUpload
+  },
+
+  methods: {
+    handleFileLoaded(file) {
+      console.log(file)
+    },
+    handleFileError() {
+      console.log('Could not load file')
+    }
+  }
+};
 </script>
 
 <style>

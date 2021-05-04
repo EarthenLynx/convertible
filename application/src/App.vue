@@ -10,16 +10,18 @@
       <app-theme-button @click="toggleDarkTheme">Toggle Theme</app-theme-button>
     </div>
   </div>
-  <router-view />
+  <main id="body">
+    <router-view />
+  </main>
 </template>
 
 <script>
-import AppThemeButton from '@/components/Buttons/AppThemeButton.vue'
+import AppThemeButton from "@/components/Buttons/AppThemeButton.vue";
 export default {
   components: {
-    AppThemeButton
-  }
-}
+    AppThemeButton,
+  },
+};
 </script>
 
 <style>
@@ -27,6 +29,10 @@ body {
   transition: all 0.35s;
   @apply bg-gray-50;
   @apply dark:bg-dark-primary;
+}
+
+#body {
+  @apply px-6 lg:px-16 my-6;
 }
 
 #nav {
