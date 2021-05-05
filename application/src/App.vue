@@ -52,30 +52,11 @@ body {
 }
 
 /* Transitions */
-.slideup-enter,
-.slideup-leave-to {
-  opacity: 0;
-  transition: all 1s ease;
-  transform: translateY(10px);
+.fade-enter-from, .fade-leave-to {
+  @apply scale-75 opacity-0
 }
 
-.slideup-leave-active {
-  transform: translateX(-10px);
-  transition: all 1s ease;
-  @apply absolute w-full;
-}
-
-.slideup-move {
-  transition: all 0.75s;
-}
-
-.grow-enter, .grow-leave-to {
-  max-height: 0;
-  transition: all 1s;
-}
-
-.grow-enter-active, .grow-leave-active {
-  max-height: 250px;
-  transition: all 1s;
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.25s;
 }
 </style>

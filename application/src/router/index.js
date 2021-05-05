@@ -9,29 +9,28 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
   },
   {
     path: '/about',
     name: 'About',
-    component: About
-  },
-  {
-    path: '/upload',
-    name: 'Upload',
-    component: Upload
+    component: About,
   },
   {
     path: '/convert',
     name: 'Convert',
     component: Convert,
-
   },
   {
     path: '/gallery',
     name: 'Gallery',
     component: Gallery,
-
+    children: [
+      {
+        path: 'upload',
+        name: 'Upload',
+        component: Upload
+      }]
   },
 ]
 
