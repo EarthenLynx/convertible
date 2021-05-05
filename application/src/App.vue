@@ -68,4 +68,14 @@ body {
 .slideup-move {
   transition: all 0.75s;
 }
+
+.grow-enter, .grow-leave-to {
+  max-height: 0;
+  transition: all 1s;
+}
+
+.grow-enter-active, .grow-leave-active {
+  max-height: 250px;
+  transition: all 1s;
+}
 </style>

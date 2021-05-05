@@ -1,6 +1,6 @@
 <template>
   <div class="container m-auto">
-    <app-upload heading="Upload a file here" @fileError="handleFileError" @fileLoaded="handleFileLoaded"></app-upload>
+    <app-upload heading="Upload a file here or" @fileError="handleFileError" @fileLoaded="handleFileLoaded"></app-upload>
   </div>
 </template>
 

@@ -5,11 +5,11 @@
     @drop.prevent="handleFileInput"
   >
     <!-- Upload dropdown section -->
-    <div class="upload-wrapper">
+    <div class="upload-wrapper" :class="{ 'bg-white animate-pulse': over }">
       <div id="header" class="upload-header">
-        <h1 class="text-xl">
+        <h1 class="text-xl mb-4">
           {{ heading }}
-          <label for="fileupload" class="upload-label">or Browse</label>
+          <label for="fileupload" class="upload-label">Browse</label>
           <input
             id="fileupload"
             class="hidden"
@@ -19,13 +19,27 @@
             multiple
           />
         </h1>
+        <transition
+          @before-enter="beforeEnter"
+          @enter="enter"
+          @leave="leave"
+          :css="false"
+        >
+          <small v-if="fileItems.length > 0" class="text-base cursor-pointer"
+            >Add to gallery</small
+          >
+        </transition>
       </div>
 
-      <main
-        class="upload-body relative"
-        :class="{ 'bg-white animate-pulse': over }"
-      >
-        <transition-group name="slideup" tag="ul" appear>
+      <main class="upload-body relative">
+        <transition-group
+          @before-enter="beforeEnter"
+          @enter="enter"
+          @leave="leave"
+          :css="false"
+          tag="ul"
+          appear
+        >
           <app-upload-item
             v-for="(file, index) in fileItems"
             :key="file.name"
@@ -34,14 +48,13 @@
           />
         </transition-group>
       </main>
-      <div class="upload-footer">
-        <app-button>Add to gallery</app-button>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Velocity from "velocity-animate";
+
 import AppButton from "@/components/Buttons/AppButton.vue";
 import AppUploadItem from "@/components/FormElements/AppUploadItem.vue";
 export default {
@@ -74,6 +87,44 @@ export default {
   },
 
   methods: {
+    // Animation methods
+    beforeEnter(el) {
+      el.style.opacity = 0;
+      el.style.height = "0em";
+    },
+
+    enter(el, done) {
+      Velocity(
+        el,
+        {
+          opacity: 1,
+          height: "100%",
+        },
+        {
+          duration: 2000,
+          easing: [100, 5],
+          complete: done,
+        }
+      );
+    },
+
+    leave(el, done) {
+      Velocity(
+        el,
+        {
+          opacity: 0,
+          height: "0em",
+          padding: 0,
+          margin: 0,
+          position: "absolute",
+        },
+        {
+          duration: 500,
+          easing: "ease-out",
+          complete: done,
+        }
+      );
+    },
     // Drag & Drop methods
     handleDragOver() {
       this.over = true;
@@ -173,23 +224,23 @@ export default {
 
 <style scoped>
 .upload-wrapper {
-  @apply border shadow-md rounded-lg bg-white;
+  @apply shadow-md rounded-lg bg-white p-3 m-auto w-10/12 md:w-8/12 lg:w-4/12;
   @apply dark:bg-dark;
 }
 
 .upload-header {
-  @apply text-center m-2 p-8 text-xl text-primary border-2 rounded border-dashed border-primary;
+  @apply text-center pt-8 pb-4 text-xl text-primary border-2 rounded border-dashed border-primary;
 }
 
 .upload-body {
-  @apply m-2;
+  @apply transition-all;
 }
 
 .upload-footer {
-  @apply m-2 text-right;
+  @apply text-right;
 }
 
 .upload-label {
-  @apply items-center cursor-pointer transition-all hover:text-secondary;
+  @apply items-center cursor-pointer transition-all text-white bg-secondary bg-opacity-60 px-2 py-1 rounded-full hover:bg-opacity-80;
 }
 </style>
