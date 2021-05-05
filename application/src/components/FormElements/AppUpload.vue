@@ -19,23 +19,20 @@
             multiple
           />
         </h1>
-        <transition
-          @before-enter="beforeEnter"
-          @enter="enter"
-          @leave="leave"
-          :css="false"
-        >
-          <small v-if="fileItems.length > 0" class="text-base cursor-pointer"
+
+          <small
+            v-if="fileItems.length > 0"
+            class="text-base cursor-pointer"
+            @click="handleFilesToGallery"
             >Add to gallery</small
           >
-        </transition>
       </div>
 
       <main class="upload-body relative">
         <transition-group
-          @before-enter="beforeEnter"
-          @enter="enter"
-          @leave="leave"
+          @before-enter="hasNoHeight"
+          @enter="growsInHeight"
+          @leave="shrinksInHeight"
           :css="false"
           tag="ul"
           appear
@@ -53,13 +50,14 @@
 </template>
 
 <script>
-import Velocity from "velocity-animate";
-
+import animate from "@/mixins/animate.mixin.js";
 import AppButton from "@/components/Buttons/AppButton.vue";
 import AppUploadItem from "@/components/FormElements/AppUploadItem.vue";
+
 export default {
   name: "AppUpload",
   components: { AppButton, AppUploadItem },
+  mixins: [animate],
   props: {
     heading: { type: String, default: "Drag a file here" },
     uploadUrl: String,
@@ -88,42 +86,12 @@ export default {
 
   methods: {
     // Animation methods
-    beforeEnter(el) {
-      el.style.opacity = 0;
-      el.style.height = "0em";
-    },
 
-    enter(el, done) {
-      Velocity(
-        el,
-        {
-          opacity: 1,
-          height: "100%",
-        },
-        {
-          duration: 2000,
-          easing: [100, 5],
-          complete: done,
-        }
-      );
-    },
-
-    leave(el, done) {
-      Velocity(
-        el,
-        {
-          opacity: 0,
-          height: "0em",
-          padding: 0,
-          margin: 0,
-          position: "absolute",
-        },
-        {
-          duration: 500,
-          easing: "ease-out",
-          complete: done,
-        }
-      );
+    handleFilesToGallery() {
+      const { fileItems } = this;
+      this.$emit("receiveFiles", fileItems);
+      this.$router.push({ name: "Gallery" });
+      this.fileItems = [];
     },
     // Drag & Drop methods
     handleDragOver() {
@@ -159,7 +127,6 @@ export default {
             this.over = false;
             this.loaded = true;
             this.fileItems.push(fileItem);
-            this.$emit("fileLoaded", this.fileItem);
           };
         }
       });
