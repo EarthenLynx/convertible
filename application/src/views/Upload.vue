@@ -6,7 +6,7 @@
     <app-upload
       heading="Upload a file here or"
       @fileError="handleFileError"
-      @fileLoaded="handleFileLoaded"
+      @receiveFiles="onFilesReceived"
     ></app-upload>
   </div>
 </template>
@@ -19,8 +19,12 @@ export default {
   },
 
   methods: {
-    handleFileLoaded(file) {
-      console.log(file);
+    onFilesReceived(files) {
+      console.log(files);
+      const receivedFiles = [...files];
+      this.$store.commit("CREATE_IMAGE", {
+        files: receivedFiles,
+      });
     },
     handleFileError() {
       console.log("Could not load file");

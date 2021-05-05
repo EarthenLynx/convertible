@@ -1,6 +1,6 @@
 <template>
   <div>
-    this is the gallery page
+    {{ images }}
     <router-view v-slot="{ Component }">
       <transition name="fade" appear>
         <component :is="Component" />
@@ -10,7 +10,12 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters(["images", "getImageById"]),
+  },
+};
 </script>
 
 <style>
