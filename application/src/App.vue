@@ -53,10 +53,10 @@ body {
 
 /* Transitions */
 .fade-enter-from, .fade-leave-to {
-  @apply scale-75 opacity-0
+  @apply opacity-0
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all 0.25s;
+  @apply transition
 }
 </style>

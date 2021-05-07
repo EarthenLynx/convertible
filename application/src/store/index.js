@@ -14,7 +14,7 @@ export default createStore({
   },
   mutations: {
     CREATE_IMAGE(state, { files }) {
-      state.images.push(files);
+      files.forEach(file => state.images.push(file))
     },
 
     DELETE_IMAGE(state, { index }) {

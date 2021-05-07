@@ -51,6 +51,7 @@
 
 <script>
 import animate from "@/mixins/animate.mixin.js";
+import { v4 as uuidv4 } from "uuid";
 import AppButton from "@/components/Buttons/AppButton.vue";
 import AppUploadItem from "@/components/FormElements/AppUploadItem.vue";
 
@@ -119,6 +120,7 @@ export default {
           reader.readAsArrayBuffer(file);
           reader.onloadend = (event) => {
             const fileItem = {
+              id: uuidv4(),
               name: file.name,
               size: (file.size / 1000).toFixed(2),
               type: file.type.split("/")[1],

@@ -18,9 +18,9 @@
       <!-- <img :src="imageUrl" :alt="file.name" class="fileitem-image"> -->
     </div>
     <div class="fileitem-body">
-      <p class="fileitem-name">
+      <h4 class="fileitem-name">
         {{ file.name }}
-      </p>
+      </h4>
       <small class="fileitem-size"> {{ file.size }} kb </small>
     </div>
     <div class="fileitem-icon-wrapper" @click="$emit('fileClose')">
