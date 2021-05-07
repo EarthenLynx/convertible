@@ -4,7 +4,7 @@
       <header
         v-if="!showBody"
         class="galleryitem-header"
-        :style="{ 'background-color': `${background.light}` }"
+        @click="$emit('imageHeaderClicked', image.id)"
       >
         <img :src="imageUrl" :alt="item.name" class="galleryitem-image" />
       </header>
@@ -19,66 +19,42 @@
     </transition>
 
     <footer class="galleryitem-footer">
-      <i class="galleryitem-icon" @click="$emit('deleteItem', item.id)">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20 12H4"
-          />
-        </svg>
-      </i>
-      <i class="galleryitem-icon" @click="$emit('selectItem', item.id)">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </i>
-      <i class="galleryitem-icon" @mouseenter="showBody = true" @mouseleave="showBody = false">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </i>
+      <trash-icon
+        class="galleryitem-icon"
+        @click="$emit('imageDeleteClicked', image.id)"
+      >
+      </trash-icon>
+      <graph-icon
+        class="galleryitem-icon"
+        @click="$emit('imageInspectClicked', item.id)"
+      >
+      </graph-icon>
+      <info-icon
+        class="galleryitem-icon"
+        @mouseenter="showBody = true"
+        @mouseleave="showBody = false"
+      >
+
+      </info-icon>
     </footer>
   </div>
 </template>
 
 <script>
-import * as Vibrant from "node-vibrant";
+import Popper from "vue-popperjs";
+import TrashIcon from "@/components/Icons/trash.vue";
+import GraphIcon from "@/components/Icons/graph.vue";
+import InfoIcon from "@/components/Icons/info.vue";
+import "vue-popperjs/dist/vue-popper.css";
 import AnimateMixin from "@/mixins/animate.mixin.js";
 import AppButton from "@/components/Buttons/AppButton.vue";
 export default {
-  mounted() {
-    this.getDominantColorsFromImage();
-  },
   components: {
     AppButton,
+    Popper,
+    TrashIcon,
+    GraphIcon,
+    InfoIcon,
   },
   mixins: [AnimateMixin],
   data() {
@@ -104,18 +80,6 @@ export default {
       return src;
     },
   },
-
-  methods: {
-    getDominantColorsFromImage() {
-      Vibrant.from(this.imageUrl)
-        .getPalette()
-        .then((palette) => {
-          console.log(palette);
-          this.background.light = palette.LightMuted.hex;
-          this.background.dark = palette.DarkMuted.hex;
-        });
-    },
-  },
 };
 </script>
 
@@ -127,7 +91,8 @@ export default {
 
 .galleryitem-header {
   cursor: zoom-in;
-  @apply h-40 w-full rounded-t flex items-center;
+  @apply h-40 w-full rounded-t flex items-center bg-gray-200;
+  @apply dark:bg-gray-700;
 }
 
 .galleryitem-image {
@@ -140,6 +105,7 @@ export default {
 
 .galleryitem-body-text {
   @apply my-2;
+  @apply dark:text-dark-accent;
 }
 
 .galleryitem-footer {
@@ -148,5 +114,6 @@ export default {
 
 .galleryitem-icon {
   @apply cursor-pointer w-6 h-6;
+  @apply dark:text-dark-accent;
 }
 </style>
