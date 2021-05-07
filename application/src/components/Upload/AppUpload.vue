@@ -53,7 +53,7 @@
 import animate from "@/mixins/animate.mixin.js";
 import { v4 as uuidv4 } from "uuid";
 import AppButton from "@/components/Buttons/AppButton.vue";
-import AppUploadItem from "@/components/FormElements/AppUploadItem.vue";
+import AppUploadItem from "@/components/Upload/AppUploadItem.vue";
 
 export default {
   name: "AppUpload",

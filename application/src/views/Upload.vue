@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import AppUpload from "@/components/FormElements/AppUpload.vue";
+import AppUpload from "@/components/Upload/AppUpload.vue";
 export default {
   components: {
     AppUpload,
@@ -20,7 +20,6 @@ export default {
 
   methods: {
     onFilesReceived(files) {
-      console.log(files);
       const receivedFiles = [...files];
       this.$store.commit("CREATE_IMAGE", {
         files: receivedFiles,
